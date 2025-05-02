@@ -1,0 +1,320 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewBag.Title</title>
+    <link rel="shortcut icon" href="@Url.Content("~/Content/Images/favicon.ico")" />
+    @Styles.Render("~/Content/styles")
+    @Scripts.Render("~/bundles/modernizr")
+    @Scripts.Render("~/bundles/jquery")
+    @Scripts.Render("~/bundles/jqueryval")
+    @Scripts.Render("~/bundles/bootstrap")
+    @RenderSection("scripts", required: false)
+    @if (IsSectionDefined("cssHead"))
+    {
+        @RenderSection("cssHead", required: false)
+    }
+    @if (IsSectionDefined("scriptHead"))
+    {
+        @RenderSection("scriptHead", required: false)
+    }
+    <style>
+        .icon:hover {
+            background-color: blue;
+        }
+    </style>
+</head>
+<body>
+    @{
+            string Navbar = Session["NavBar"] as string;
+
+    }
+    @if (!string.IsNullOrEmpty(Navbar))
+    {
+        // <p>Halo, @Navbar!</p>
+    }
+    else
+    {
+        // <p>Silakan login untuk melihat pesan selamat datang.</p>
+    }
+    <div class="page-wrapper chiller-theme sidebar-bg bg5 @(@ViewBag.NavHide != null?"":"toggled")">
+        @if (@ViewBag.NavDisabled == null)
+        {
+            <a id="show-sidebar" class="btn btn-sm btn-dark" href="#">
+                <i class="fas fa-bars"></i>
+            </a>
+            <nav id="sidebar" class="sidebar-wrapper">
+                <div class="sidebar-content">
+                    <div class="sidebar-brand">
+                        <a href="@Url.Action("Index", "Home", new { area = "" })" style="">
+                            <img src="~/Images/niterra-logo-font-white.png" class="img-fluid d-inline-block" style="height:25px;" /> Portal
+                        </a>
+                        <div id="close-sidebar">
+                            <i class="fas fa-times"></i>
+                        </div>
+                    </div>
+
+                    @Html.Partial("_LoginPartialNew")
+
+
+
+                    @if (IsSectionDefined("sideMenu"))
+                    {
+                        <div class="sidebar-menu keep">
+                            <ul>
+                                <li class="header-menu keep">
+                                    <span>
+                                        @ViewBag.SideMenuHeader
+                                    </span>
+                                </li>
+
+                                <li class="sidebar-dropdown keep">
+                                    <div class="sidebar-submenu keep" style="display: block;">
+                                        @RenderSection("sideMenu")
+                                    </div>
+                                </li>
+                            </ul>
+                        </div>
+                    }
+                    <!-- sidebar-header  -->
+                    @Html.Action("mainMenu", "Home", new { area = "" })
+
+                    @*<div class="row">
+                        <a href="#" style="height:auto">
+                            <img src="~/Content/Images/ngk-logo.png" alt="Alternate Text" class="img-fluid" />
+                        </a>
+                    </div>*@
+                </div>
+                <div class="sidebar-content">
+                    <div class="sidebar-brand">
+                        <center><img src="~/Images/QR Code Whistleblowing Niterra.png" style="height:220px; width:105%" /></center>
+                    </div>
+                </div>
+                <div class="sidebar-footer">
+
+                    @if (Request.IsAuthenticated)
+                    {
+                        @*<div class="dropdown">
+                            <a href="#" class="" id="dropdownMenuNotification" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                <i class="fa fa-bell"></i>
+                                <span class="badge badge-pill badge-warning notification">3</span>
+                            </a>
+                            <div class="dropdown-menu notifications" aria-labelledby="dropdownMenuMessage">
+                                <div class="notifications-header">
+                                    <i class="fa fa-bell"></i>
+                                    Notifications
+                                </div>
+                                <div class="dropdown-divider"></div>
+                                <a class="dropdown-item" href="#">
+                                    <div class="notification-content">
+                                        <div class="icon">
+                                            <i class="fas fa-check text-success border border-success"></i>
+                                        </div>
+                                        <div class="content">
+                                            <div class="notification-detail">Lorem ipsum dolor sit amet consectetur adipisicing elit. In totam explicabo</div>
+                                            <div class="notification-time">
+                                                6 minutes ago
+                                            </div>
+                                        </div>
+                                    </div>
+                                </a>
+                                <a class="dropdown-item" href="#">
+                                    <div class="notification-content">
+                                        <div class="icon">
+                                            <i class="fas fa-exclamation text-info border border-info"></i>
+                                        </div>
+                                        <div class="content">
+                                            <div class="notification-detail">Lorem ipsum dolor sit amet consectetur adipisicing elit. In totam explicabo</div>
+                                            <div class="notification-time">
+                                                Today
+                                            </div>
+                                        </div>
+                                    </div>
+                                </a>
+                                <a class="dropdown-item" href="#">
+                                    <div class="notification-content">
+                                        <div class="icon">
+                                            <i class="fas fa-exclamation-triangle text-warning border border-warning"></i>
+                                        </div>
+                                        <div class="content">
+                                            <div class="notification-detail">Lorem ipsum dolor sit amet consectetur adipisicing elit. In totam explicabo</div>
+                                            <div class="notification-time">
+                                                Yesterday
+                                            </div>
+                                        </div>
+                                    </div>
+                                </a>
+                                <div class="dropdown-divider"></div>
+                                <a class="dropdown-item text-center" href="#">View all notifications</a>
+                            </div>
+                        </div>*@
+                        @*<div class="dropdown">
+                            <a href="#" class="" id="dropdownMenuMessage" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                <i class="fa fa-envelope"></i>
+                                <span class="badge badge-pill badge-success notification">7</span>
+                            </a>
+                            <div class="dropdown-menu messages" aria-labelledby="dropdownMenuMessage">
+                                <div class="messages-header">
+                                    <i class="fa fa-envelope"></i>
+                                    Messages
+                                </div>
+                                <div class="dropdown-divider"></div>
+                                <a class="dropdown-item" href="#">
+                                    <div class="message-content">
+                                        <div class="pic">
+                                            <img src="assets/img/user.jpg" alt="">
+                                        </div>
+                                        <div class="content">
+                                            <div class="message-title">
+                                                <strong> Jhon doe</strong>
+                                            </div>
+                                            <div class="message-detail">Lorem ipsum dolor sit amet consectetur adipisicing elit. In totam explicabo</div>
+                                        </div>
+                                    </div>
+
+                                </a>
+                                <a class="dropdown-item" href="#">
+                                    <div class="message-content">
+                                        <div class="pic">
+                                            <img src="assets/img/user.jpg" alt="">
+                                        </div>
+                                        <div class="content">
+                                            <div class="message-title">
+                                                <strong> Jhon doe</strong>
+                                            </div>
+                                            <div class="message-detail">Lorem ipsum dolor sit amet consectetur adipisicing elit. In totam explicabo</div>
+                                        </div>
+                                    </div>
+
+                                </a>
+                                <a class="dropdown-item" href="#">
+                                    <div class="message-content">
+                                        <div class="pic">
+                                            <img src="assets/img/user.jpg" alt="">
+                                        </div>
+                                        <div class="content">
+                                            <div class="message-title">
+                                                <strong> Jhon doe</strong>
+                                            </div>
+                                            <div class="message-detail">Lorem ipsum dolor sit amet consectetur adipisicing elit. In totam explicabo</div>
+                                        </div>
+                                    </div>
+                                </a>
+                                <div class="dropdown-divider"></div>
+                                <a class="dropdown-item text-center" href="#">View all messages</a>
+
+                            </div>
+                        </div>*@
+                        <div class="dropdown">
+                            <a href="#" class="" id="dropdownMenuMessage" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                <i class="fa fa-cog"></i>
+                            </a>
+                            <div class="dropdown-menu" aria-labelledby="dropdownMenuMessage">
+                                <a class="dropdown-item" href="/NGKBusi/User/ChangePassword">Change Password</a>
+                                @*<a class="dropdown-item" href="#">Help</a>
+                                <a class="dropdown-item" href="#">Setting</a>*@
+                            </div>
+                        </div>
+                        <div>
+                            <a href="@Url.Action("Logout", "User", new { area = "" })">
+                                <i class="fa fa-power-off"></i> Logout
+                            </a>
+                        </div>
+                    }
+                    else
+                    {
+                        <div>
+                            <a href="@Url.Action("Login", "User", new { area = "" })">Login Page</a>
+                        </div>
+                    }
+                </div>
+            </nav>
+        }
+    <main class="page-content">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="form-group col-md-12">
+                    @RenderBody()
+                </div>
+                <hr />
+                <div class="row">
+                    <div class="form-group col-md-12">
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+       
+        <footer class="container-fluid">
+            <div class="row">
+                <div class="form-group col-12">
+                    <hr />
+                    <p>@DateTime.Now.Year - PT <span style="color:#00757f;">N<span style="color:#f9b600;">i</span>terra</span> Mobility Indonesia</p>
+                </div>
+            </div>
+        </footer>
+
+    </div>
+</body>
+<script>
+    //// Fungsi untuk menyimpan tab yang dipilih
+    //$(document).ready(function () {
+    //    // Cek apakah ada tab yang dipilih sebelumnya di localStorage
+    //    console.log(localStorage.getItem('sidebarToggled'));
+    //    if (localStorage.getItem('sidebarToggled') === 'true') {
+    //        // Jika ya, tambahkan kelas 'toggled' ke elemen .page-wrapper
+    //        $('.page-wrapper').addClass('toggled');
+    //    }
+    //});
+    //$('#close-sidebar').click(function () {
+    //    // Toggle kelas 'toggled' pada elemen dengan kelas .page-wrapper
+    //    //$('.page-wrapper').toggleClass('toggled');
+
+    //    // Simpan status perubahan kelas 'toggled' ke localStorage
+    //    if ($('.page-wrapper').hasClass('toggled')) {
+    //        $('.page-wrapper').removeClass('toggled')
+    //        localStorage.setItem('sidebarToggled', 'false');
+    //    } else {
+    //        $('.page-wrapper').addClass('toggled');
+    //        localStorage.setItem('sidebarToggled', 'true');
+    //    }
+
+    //    console.log(localStorage.getItem('sidebarToggled'));
+    //});
+
+
+
+    $('.btnFavorite').click(function () {
+        var id = $(this).attr('id');
+        console.log(id);
+    });
+
+    $('#close-sidebar').click(function () {
+        var id = $(this).attr('id');
+        setSessionData('Navbar', 'false');
+    });
+
+    $('#show-sidebar').click(function () {
+        var id = $(this).attr('id');
+        console.log(id);
+        setSessionData('Navbar', 'true');
+    })
+
+    function setSessionData(key, value) {
+        var urlString = "/ngk-portal/Home/RemoveFavoriteMenu";
+        $.ajax({
+            type: 'POST',
+            url: '@Url.Action("SetSessionData", "Home", new { area = "" })',
+            data: { key: key, value: value },
+            success: function (result) {
+                console.log("Session data berhasil diatur.");
+            },
+            error: function (xhr, status, error) {
+                console.error("Gagal mengatur session data: " + error);
+            }
+        });
+    }
+</script>
+</html>

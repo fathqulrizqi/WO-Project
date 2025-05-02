@@ -1,0 +1,24 @@
+﻿
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section cssHead{
+    <style type="text/css">
+        table, th, td {
+            padding: 3px;
+            background-color:white;
+        }
+    </style>
+}
+@if (Request.IsAuthenticated && ViewBag.allowedUpdate != null && ViewBag.allowedUpdate == true) {
+<div class="text-center">
+    <a href="@Url.Action("Edit","ExtNumber")" class="btn btn-primary text-center" style="margin : 15px auto;">Edit</a>
+</div>
+}
+@foreach (var item in ViewBag.pageContent)
+{
+    @Html.Raw(@item.pageContent);
+}
+

@@ -1,0 +1,916 @@
+﻿<!doctype html>
+@{
+    ViewBag.Title = "D365 Excel Form";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+    var currUser = ViewBag.CurrUser;
+}
+
+@section cssHead{
+    <link href="@Url.Content("~/Content/bootstrap-table/bootstrap-table.min.css")" rel="stylesheet">
+
+    <style>
+        body {
+            font-size: 0.9rem;
+        }
+        .card-header {
+            font-size: 1.2rem;
+        }
+        .card .card-header a:link {
+            text-decoration: none;
+            color: white;
+        }
+    </style>
+}
+
+@section scriptHead{
+    <script src="@Url.Content("~/Content/bootstrap-table-dist/bootstrap-table.min.js")"></script>
+    <script src="@Url.Content("~/Content/bootstrap-table-dist/extensions/toolbar/bootstrap-table-toolbar.min.js")"></script>
+    <script src="https://cdn.jsdelivr.net/npm/tableexport.jquery.plugin@1.10.21/tableExport.min.js"></script>
+    <script src="https://unpkg.com/bootstrap-table@1.21.0/dist/extensions/export/bootstrap-table-export.min.js"></script>
+    <script src="@Url.Content("~/Content/bootstrap-table-dist/extensions/filter-control/bootstrap-table-filter-control.min.js")"></script>
+}
+
+@*
+
+    
+
+    
+
+    .card a:hover {
+        text-decoration: none;
+        font
+    }
+
+    .card-header .fa {
+        transition: .3s transform ease-in-out;
+    }
+
+    .card-header .collapsed .fa {
+        transform: rotate(90deg);
+    }
+
+
+    /* spinner */
+    *.hidden {
+        display: none !important;
+    }
+
+    div.loading {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(16, 16, 16, 0.5);
+        z-index: 1000;
+    }
+
+    @@-webkit-keyframes uil-ring-anim {
+        0% {
+            -ms-transform: rotate(0deg);
+            -moz-transform: rotate(0deg);
+            -webkit-transform: rotate(0deg);
+            -o-transform: rotate(0deg);
+            transform: rotate(0deg);
+        }
+
+        100% {
+            -ms-transform: rotate(360deg);
+            -moz-transform: rotate(360deg);
+            -webkit-transform: rotate(360deg);
+            -o-transform: rotate(360deg);
+            transform: rotate(360deg);
+        }
+    }
+
+    @@-webkit-keyframes uil-ring-anim {
+        0% {
+            -ms-transform: rotate(0deg);
+            -moz-transform: rotate(0deg);
+            -webkit-transform: rotate(0deg);
+            -o-transform: rotate(0deg);
+            transform: rotate(0deg);
+        }
+
+        100% {
+            -ms-transform: rotate(360deg);
+            -moz-transform: rotate(360deg);
+            -webkit-transform: rotate(360deg);
+            -o-transform: rotate(360deg);
+            transform: rotate(360deg);
+        }
+    }
+
+    @@-moz-keyframes uil-ring-anim {
+        0% {
+            -ms-transform: rotate(0deg);
+            -moz-transform: rotate(0deg);
+            -webkit-transform: rotate(0deg);
+            -o-transform: rotate(0deg);
+            transform: rotate(0deg);
+        }
+
+        100% {
+            -ms-transform: rotate(360deg);
+            -moz-transform: rotate(360deg);
+            -webkit-transform: rotate(360deg);
+            -o-transform: rotate(360deg);
+            transform: rotate(360deg);
+        }
+    }
+
+    @@-ms-keyframes uil-ring-anim {
+        0% {
+            -ms-transform: rotate(0deg);
+            -moz-transform: rotate(0deg);
+            -webkit-transform: rotate(0deg);
+            -o-transform: rotate(0deg);
+            transform: rotate(0deg);
+        }
+
+        100% {
+            -ms-transform: rotate(360deg);
+            -moz-transform: rotate(360deg);
+            -webkit-transform: rotate(360deg);
+            -o-transform: rotate(360deg);
+            transform: rotate(360deg);
+        }
+    }
+
+    @@-moz-keyframes uil-ring-anim {
+        0% {
+            -ms-transform: rotate(0deg);
+            -moz-transform: rotate(0deg);
+            -webkit-transform: rotate(0deg);
+            -o-transform: rotate(0deg);
+            transform: rotate(0deg);
+        }
+
+        100% {
+            -ms-transform: rotate(360deg);
+            -moz-transform: rotate(360deg);
+            -webkit-transform: rotate(360deg);
+            -o-transform: rotate(360deg);
+            transform: rotate(360deg);
+        }
+    }
+
+    @@-webkit-keyframes uil-ring-anim {
+        0% {
+            -ms-transform: rotate(0deg);
+            -moz-transform: rotate(0deg);
+            -webkit-transform: rotate(0deg);
+            -o-transform: rotate(0deg);
+            transform: rotate(0deg);
+        }
+
+        100% {
+            -ms-transform: rotate(360deg);
+            -moz-transform: rotate(360deg);
+            -webkit-transform: rotate(360deg);
+            -o-transform: rotate(360deg);
+            transform: rotate(360deg);
+        }
+    }
+
+    @@-o-keyframes uil-ring-anim {
+        0% {
+            -ms-transform: rotate(0deg);
+            -moz-transform: rotate(0deg);
+            -webkit-transform: rotate(0deg);
+            -o-transform: rotate(0deg);
+            transform: rotate(0deg);
+        }
+
+        100% {
+            -ms-transform: rotate(360deg);
+            -moz-transform: rotate(360deg);
+            -webkit-transform: rotate(360deg);
+            -o-transform: rotate(360deg);
+            transform: rotate(360deg);
+        }
+    }
+
+    @@keyframes uil-ring-anim {
+        0% {
+            -ms-transform: rotate(0deg);
+            -moz-transform: rotate(0deg);
+            -webkit-transform: rotate(0deg);
+            -o-transform: rotate(0deg);
+            transform: rotate(0deg);
+        }
+
+        100% {
+            -ms-transform: rotate(360deg);
+            -moz-transform: rotate(360deg);
+            -webkit-transform: rotate(360deg);
+            -o-transform: rotate(360deg);
+            transform: rotate(360deg);
+        }
+    }
+
+    .uil-ring-css {
+        margin: auto;
+        position: absolute;
+        top: 0;
+        left: 0;
+        bottom: 0;
+        right: 0;
+        width: 200px;
+        height: 200px;
+    }
+
+        .uil-ring-css > div {
+            position: absolute;
+            display: block;
+            width: 160px;
+            height: 160px;
+            top: 20px;
+            left: 20px;
+            border-radius: 80px;
+            box-shadow: 0 6px 0 0 #ffffff;
+            -ms-animation: uil-ring-anim 1s linear infinite;
+            -moz-animation: uil-ring-anim 1s linear infinite;
+            -webkit-animation: uil-ring-anim 1s linear infinite;
+            -o-animation: uil-ring-anim 1s linear infinite;
+            animation: uil-ring-anim 1s linear infinite;
+        }*@
+
+
+<div class="loading" style="display:none">
+    <div class='uil-ring-css' style='transform:scale(0.79);'>
+        <div></div>
+    </div>
+</div>
+<div class="row">
+
+    <div class="col-12">
+
+        <div class="card">
+            <div class="card-header bg-primary">
+
+                <div>
+                    <a class="collapsed d-block" data-toggle="collapse" href="#collapse-collapsed-salesOrderLilnes" aria-expanded="true" aria-controls="collapse-collapsed" id="heading-collapsed">
+                        Upload Sales Order Lines
+                        <i class="fa fa-chevron-down pull-right" style="float:right"></i>
+
+                    </a>
+                </div>
+
+            </div>
+            <div id="collapse-collapsed-salesOrderLilnes" class="collapse" aria-labelledby="heading-collapsed">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-12">
+                            <form action="@Url.Action("OrderLines", "D365ExcelForm", new { area = "Sales" })" method="post" enctype="multipart/form-data" id="FormUploadOrderLine">
+                                <div class="form-group row">
+                                    <label for="inputFile" class="col-sm-4 col-form-label">Upload Sales Order Lines</label>
+                                    <div class="col-sm-8">
+                                        <input type="file" name="fileOrderLine" class="form-control col-sm-6" id="inputFile" required>
+                                    </div>
+                                </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <button class="btn btn-primary" type="submit">Impor</button>
+                </div>
+            </div>
+            </form>
+            <div class="form-group mt-3" id="processOrderLine" style="display:none">
+                <div class="progress">
+                    <div class="progress-bar progress-bar-striped active bg-danger" role="progressbar">
+
+                    </div>
+                </div>
+                <span id="process_data_order_line"></span>
+            </div>
+        </div>
+    </div>
+    @*<div class="col-12">
+            <div class="card">
+                <div class="card-header bg-primary">
+                    <div>
+                        <a class="collapsed d-block" data-toggle="collapse" href="#collapse-collapsed-salesBI" aria-expanded="true" aria-controls="collapse-collapsed" id="heading-collapsed">
+                            Sales BI
+                            <i class="fa fa-chevron-down pull-right"></i>
+                        </a>
+                    </div>
+                </div>
+                <form action="@Url.Action("SalesBI", "D365ExcelForm", new { area = "Sales" })" method="post" enctype="multipart/form-data" id="formUploadSalesBI">
+                    <div id="collapse-collapsed-salesBI" class="collapse" aria-labelledby="heading-collapsed">
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-12">
+
+                                    <div class="form-group row">
+                                        <label for="inputFile" class="col-sm-4 col-form-label">Upload Sales BI</label>
+                                        <div class="col-sm-8">
+                                            <input type="file" name="uploadSalesBI" class="form-control col-sm-6" id="inputFile" required>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-footer">
+                            <button class="btn btn-primary" type="submit">Impor</button>
+                        </div>
+                    </div>
+                </form>
+                <div class="form-group mt-3" id="processSalesBI" style="display:none">
+                    <div class="progress">
+                        <div class="progress-bar progress-bar-striped active progress-bar-animated bg-primary" role="progressbar">
+
+                        </div>
+                    </div>
+                    <span id="process_data_sales_bi"></span>
+                </div>
+            </div>
+        </div>*@
+
+</div>
+<div class="row">
+
+    <div class="col-12">
+        <div class="card mt-4">
+            <div class="card-header bg-primary">
+                <div>
+                    <a class="collapsed d-block" data-toggle="collapse" href="#collapse-collapsed-sales" aria-expanded="true" aria-controls="collapse-collapsed" id="heading-collapsed">
+                        Upload Sales
+                        <i class="fa fa-chevron-down pull-right" style="float:right"></i>
+                    </a>
+                </div>
+            </div>
+            <div id="collapse-collapsed-sales" class="collapse" aria-labelledby="heading-collapsed">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-12">
+                            <form action="@Url.Action("Sales", "D365ExcelForm", new { area = "Sales" })" method="post" enctype="multipart/form-data" id="formUploadSales">
+                                <div class="form-group row">
+                                    <label for="inputFile" class="col-sm-4 col-form-label">Upload Sales</label>
+                                    <div class="col-sm-8">
+                                        <input type="file" name="uploadSales" class="form-control col-sm-6" id="inputFile" required>
+                                    </div>
+                                </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <button class="btn btn-primary" type="submit">Impor</button>
+                </div>
+            </div>
+            </form>
+            <div class="form-group mt-3" id="process" style="display:none">
+                <div class="progress">
+                    <div class="progress-bar progress-bar-striped active progress-bar-animated bg-warning" role="progressbar">
+
+                    </div>
+                </div>
+                <span id="process_data"></span>
+            </div>
+        </div>
+    </div>
+    @*<div class="col-12">
+            <div class="card mt-4">
+                <div class="card-header bg-success">
+                    <div>
+                        <a class="collapsed d-block" data-toggle="collapse" href="#collapse-collapsed-salesPackingQuantity" aria-expanded="true" aria-controls="collapse-collapsed" id="heading-collapsed">
+                            Sales Packing Quantity
+                            <i class="fa fa-chevron-down pull-right"></i>
+                        </a>
+                    </div>
+                </div>
+                <form action="@Url.Action("SalesPackingQuantity", "D365ExcelForm", new { area = "Sales" })" method="post" enctype="multipart/form-data" id="formUploadSalesPackingQuantity">
+                    <div id="collapse-collapsed-salesPackingQuantity" class="collapse" aria-labelledby="heading-collapsed">
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-12">
+
+                                    <div class="form-group row">
+                                        <label for="inputFile" class="col-sm-4 col-form-label">Upload Sales</label>
+                                        <div class="col-sm-8">
+                                            <input type="file" name="uploadSalesPackingQuantity" class="form-control col-sm-6" id="inputFile" required>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-footer">
+                            <button class="btn btn-primary" type="submit">Impor</button>
+                        </div>
+                    </div>
+                </form>
+                <div class="form-group mt-3" id="processPackingQuantity" style="display:none">
+                    <div class="progress">
+                        <div class="progress-bar-packing-quantity progress-bar-striped active progress-bar-animated bg-success" role="progressbar">
+
+                        </div>
+                    </div>
+                    <span id="process_data_packing_quantity"></span>
+                </div>
+            </div>
+        </div>*@
+</div>
+<div class="row">
+    <div class="col-12">
+        <div class="card mt-4">
+            <div class="card-header bg-success">
+                <div>
+                    <a class="collapsed d-block" data-toggle="collapse" href="#collapse-collapsed-dataBO" aria-expanded="true" aria-controls="collapse-collapsed" id="heading-collapsed">
+                        Data Back Order
+                        <i class="fa fa-chevron-down pull-right" style="float:right"></i>
+                    </a>
+                </div>
+            </div>
+            <div id="collapse-collapsed-dataBO" class="collapse" aria-labelledby="heading-collapsed">
+                <div class="card-body">
+                    <div id="toolbar">
+                        <button id="btn-reload" class="btn btn-primary">
+                            <i class="fa fa-refresh"></i> Reload
+                        </button>
+                    </div>
+                    <table id="fresh-table"
+                           data-ajax="ajaxRequest"
+                           data-query-params="queryParams"
+                           data-show-export="true"
+                           data-pagination="true"
+                           data-pagination-v-align="bottom"
+                           data-toolbar="#toolbar"
+                           data-show-columns-toggle-all="true"
+                           data-page-size="25"
+                           data-show-custom-view="true"
+                           data-show-custom-view-button="true"
+                           data-custom-view-default-view="true"
+                           data-page-list="[25, 50, 100, all]"
+                           data-formatter="dateFormat"
+                           class="table table-sm table-hover table-striped">
+                        <thead>
+                            <tr>
+                                <th data-field="No">No</th>
+                                <th data-field="SalesOrder" data-sortable="true">Sales Order</th>
+                                <th data-field="ItemNumber" data-sortable="true">Item Number</th>
+                                <th data-field="ProductName" data-sortable="true">Product Name</th>
+                                <th data-field="Customer" data-sortable="true">Customer</th>
+                                <th data-field="CustomerReference" data-sortable="true">Customer Reference</th>
+                                <th data-field="RequestedShipDate" data-sortable="true">Requested Ship Date</th>
+                                <th data-field="qty_order" data-sortable="true">QTY Order</th>
+                                <th data-field="qty_packing" data-sortable="true">QTY Packing</th>
+                                <th data-field="remaining_qty" data-sortable="true">QTY Remaining</th>
+                            </tr>
+                        </thead>
+
+                    </table>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    var $table = $('#fresh-table');
+    $(function () {
+        $('#fresh-table').bootstrapTable({
+            exportDataType: "all",
+            exportTypes: ['excel', 'pdf'],
+            buttonsClass: 'primary',
+        })
+    });
+
+    $('#btn-reload').click(function () {
+        $('#fresh-table').bootstrapTable('refresh');
+    });
+
+
+    function queryParams(params) {
+        params.switch = "";//   <<<----------catch like this
+        return params;
+    }
+    function ajaxRequest(params) {
+            //var RequestNo = "@(ViewBag.RequestNo)";
+            $.ajax({
+                type: "post",
+                url: "@Url.Action("GetDataBackOrder", "D365ExcelForm", new { area = "Sales" })",
+                dataType: 'json',
+                //data: $('#formFilter').serialize(),
+                success: function (items) {
+                    //console.log(items.rows);
+                    params.success({
+                        rows: items,
+                        data: items
+                    }, null);
+                },
+                error: function (er) {
+                    console.log(params.error(er))
+                    console.log("error", er);
+                }
+            })
+    }
+
+    function dateFormat(value) {
+        return moment(value).format('DD/MM/YYYY');
+    }
+
+    $(document).ready(function () {
+        var totalData;
+        var data;
+        var totalRow;
+        var startRow = 0;
+        var startRowSales;
+        var successInsert;
+        var arrayInsert = 0;
+        var insertDataRow;
+
+
+
+
+
+        $('#FormUploadOrderLine').on('submit', (function (e) {
+            e.preventDefault();
+            var formData = new FormData(this);
+
+            startRowSales = 2;
+            successInsert = 0;
+            insertDataRow = 0;
+
+            formData.append('startRow', startRowSales);
+            $.ajax({
+                type: 'POST',
+                url: "@Url.Action("GetTotalRowOrderLines", "D365ExcelForm", new { area = "Sales" })",
+                data: formData,
+                cache: false,
+                contentType: false,
+                processData: false,
+                beforeSend: function () {
+                    $('.loading').css("display", "");
+                },
+                success: function (json) {
+                    $('.loading').css("display", "");
+                    if (json.status == 1) {
+                        $('.loading').css("display", "none");
+                        $('.btn').prop('disabled', true);
+                        $('#processOrderLine').show();
+
+
+                        totalRow = json.totalRow;
+
+                        data = json.data;
+                        totalData = json.data.length;
+                        arrayInsert = 0;
+
+                        var dataimport = start_import_order_line(data[arrayInsert]);
+                        if (dataimport == 1) {
+                            alert("success");
+                        }
+                    }
+                },
+                error: function (data) {
+                    console.log("error");
+                    $('.loading').css("display", "none");
+                    swal("Failed!", json.msg, "error");
+
+                },
+                complete: function (data) {
+
+                }
+            });
+        }));
+
+        function start_import_order_line(insertData) {
+            $('#processOrderLine').css('display', 'block');
+            $.ajax({
+                url: "@Url.Action("ImportRowOrderLines", "D365ExcelForm", new { area = "Sales" })",
+                type: 'POST',
+                data: insertData,
+                dataType: 'json',
+                success: function (result) {
+                    if (result.status == 1) {
+
+                        arrayInsert++;
+                        successInsert++;
+                        startRowSales++;
+
+
+                        //console.log('array insert ' + arrayInsert);
+                        //console.log('success insert ' + successInsert);
+                        //console.log('start insert' + startRowSales);
+                        //console.log('total data' + totalData);
+                        //console.log('insert data ' + insertDataRow);
+
+                        var textProgress = successInsert + ' of ' + totalRow + ' row inserted';
+                        var width = Math.round((successInsert / totalRow) * 100);
+                        $('#process_data_order_line').text(textProgress);
+                        $('.progress-bar').css('width', width + '%');
+
+                        if (successInsert == totalData) {
+
+                            swal("Success!", "Finish Import Row", "success");
+                            $('.btn').prop('disabled', false);
+                            return true;
+
+
+                        } else {
+
+                            start_import_order_line(data[arrayInsert]);
+
+                        }
+                    } else {
+                        return true;
+
+                    }
+                }
+            })
+        }
+
+        $('#formUploadSalesBI').on('submit', (function (e) {
+            e.preventDefault();
+
+            var formData = new FormData(this);
+            startRowSales = 2;
+            successInsert = 0;
+            insertDataRow = 0;
+
+            formData.append('startRow', startRowSales);
+
+            $.ajax({
+                type: 'POST',
+                url: "@Url.Action("GetTotalRowSalesBI", "D365ExcelForm", new { area = "Sales" })",
+                data: formData,
+                cache: false,
+                contentType: false,
+                processData: false,
+                beforeSend: function () {
+                    $('.loading').css("display", "");
+                },
+                success: function (json) {
+                    $('.loading').css("display", "");
+                    if (json.status == 1) {
+                        $('.loading').css("display", "none");
+                        $('.btn').prop('disabled', true);
+                        $('#processSalesBI').show();
+
+
+                        totalRow = json.totalRow;
+
+                        data = json.data;
+                        totalData = json.data.length;
+                        arrayInsert = 0;
+
+                        var dataimport = start_import_order_bi(data[arrayInsert]);
+                        if (dataimport == 1) {
+                            alert("success");
+                        }
+                    }
+                },
+                error: function (data) {
+                    console.log("error");
+                    $('.loading').css("display", "none");
+                    swal("Failed!", json.msg, "error");
+
+                },
+                complete: function (data) {
+
+                }
+            });
+        }));
+
+        function start_import_order_bi(insertData) {
+            $('#processSalesBI').css('display', 'block');
+            $.ajax({
+                url: "@Url.Action("ImportRowSalesBI", "D365ExcelForm", new { area = "Sales" })",
+                type: 'POST',
+                data: insertData,
+                dataType: 'json',
+                success: function (result) {
+                    if (result.status == 1) {
+
+                        arrayInsert++;
+                        successInsert++;
+                        startRowSales++;
+
+
+                        //console.log('array insert ' + arrayInsert);
+                        //console.log('success insert ' + successInsert);
+                        //console.log('start insert' + startRowSales);
+                        //console.log('total data' + totalData);
+                        //console.log('insert data ' + insertDataRow);
+
+                        var textProgress = successInsert + ' of ' + totalRow + ' row inserted';
+                        var width = Math.round((successInsert / totalRow) * 100);
+                        $('#process_data_sales_bi').text(textProgress);
+                        $('.progress-bar').css('width', width + '%');
+
+                        if (successInsert == totalData) {
+
+                            swal("Success!", "Finish Import Row", "success");
+                            $('.btn').prop('disabled', false);
+                            return true;
+
+
+                        } else {
+
+                            start_import_order_bi(data[arrayInsert]);
+
+                        }
+                    } else {
+                        return true;
+
+                    }
+                }
+            })
+        }
+
+        $('#formUploadSalesPackingQuantity').on('submit', (function (e) {
+            e.preventDefault();
+
+            var formData = new FormData(this);
+            startRowSales = 2;
+            successInsert = 0;
+            insertDataRow = 0;
+
+            formData.append('startRow', startRowSales);
+            $.ajax({
+                type: 'POST',
+                url: "@Url.Action("GetTotalRowPackingQuantity", "D365ExcelForm", new { area = "Sales" })",
+                data: formData,
+                cache: false,
+                contentType: false,
+                processData: false,
+                beforeSend: function () {
+                    $('.loading').css("display", "");
+                },
+                success: function (json) {
+                    $('.loading').css("display", "");
+                    if (json.status == 1) {
+                        $('.loading').css("display", "none");
+                        $('.btn').prop('disabled', true);
+                        $('#processPackingQuantity').show();
+
+
+                        totalRow = json.totalRow;
+
+                        data = json.data;
+                        totalData = json.data.length;
+                        arrayInsert = 0;
+
+                        var dataimport = start_import_packing_quantity(data[arrayInsert]);
+                        if (dataimport == 1) {
+                            alert("success");
+                        }
+                    }
+                },
+                error: function (data) {
+                    console.log("error");
+                    $('.loading').css("display", "none");
+                    swal("Failed!", json.msg, "error");
+                }
+            });
+        }));
+
+        function start_import_packing_quantity(insertData) {
+            //insertDataRow++;
+            $.ajax({
+                url: "@Url.Action("ImportRowPackingQuantity", "D365ExcelForm", new { area = "Sales" })",
+                type: 'POST',
+                data: insertData,
+                dataType: 'json',
+                success: function (result) {
+                    if (result.status == 1) {
+
+                        arrayInsert++;
+                        successInsert++;
+                        startRowSales++;
+
+
+                        //console.log('array insert ' + arrayInsert);
+                        //console.log('success insert ' + successInsert);
+                        //console.log('start insert' + startRowSales);
+                        //console.log('total data' + totalData);
+                        //console.log('insert data ' + insertDataRow);
+
+                        var textProgress = successInsert + ' of ' + totalRow + ' row inserted';
+                        var width = Math.round((successInsert / totalRow) * 100);
+                        $('#process_data_packing_quantity').text(textProgress);
+                        $('.progress-bar-packing-quantity').css('width', width + '%');
+
+                        if (successInsert == totalData) {
+
+                            swal("Success!", "Finish Import Row", "success");
+                            $('.btn').prop('disabled', false);
+                            return true;
+
+
+                        } else {
+
+                            start_import_packing_quantity(data[arrayInsert]);
+
+                        }
+                    } else {
+                        return true;
+
+                    }
+                }
+            })
+        }
+
+        $('#formUploadSales').on('submit', (function (e) {
+            e.preventDefault();
+            var formData = new FormData(this);
+
+            startRowSales = 3;
+            successInsert = 0;
+            insertDataRow = 0;
+
+            formData.append('startRow', startRowSales);
+            $.ajax({
+                type: 'POST',
+                url: "@Url.Action("GetTotalRowSales", "D365ExcelForm", new { area = "Sales" })",
+                data: formData,
+                processData: false,
+                cache: false,
+                contentType: false,
+                beforeSend: function () {
+                    if (startRowSales == 3) {
+                        $('.loading').css("display", "");
+                    }
+                },
+                success: function (json) {
+
+                    if (json.status == 1) {
+                        $('.loading').css("display", "none");
+                        $('.btn').prop('disabled', true);
+                        $('#process').show();
+                        //$('#total_data').text(json.totalData);
+                        //var startRow = 3;
+                        //var impor = start_import_sales(json.fileName, startRow, json.totalData);
+                        //console.log(impor);
+                        //if (impor == true) {
+                        //    //$('.loading').css("display", "none");
+                        //    swal("Success!", json.msg, "success");
+                        //}
+
+
+                        totalRow = json.totalRow;
+
+                        data = json.data;
+                        totalData = json.data.length;
+                        arrayInsert = 0;
+
+                        var dataimport = start_import_sales(data[arrayInsert]);
+                        if (dataimport == true) {
+                            swal("Success!", "Finish Import Row", "success");
+                        }
+                        console.log(dataimport);
+                    }
+
+                }
+            });
+
+        }));
+
+        function start_import_sales(insertData) {
+            //insertDataRow++;
+            $('#process').css('display', 'block');
+            $.ajax({
+                url: "@Url.Action("ImportRowSales", "D365ExcelForm", new { area = "Sales" })",
+                type: 'POST',
+                data: insertData,
+                dataType: 'json',
+                success: function (result) {
+                    if (result.status == 1) {
+
+                        arrayInsert++;
+                        successInsert++;
+                        startRowSales++;
+
+
+                        //console.log('array insert ' + arrayInsert);
+                        //console.log('success insert ' + successInsert);
+                        //console.log('start insert' + startRowSales);
+                        //console.log('total data' + totalData);
+                        //console.log('insert data ' + insertDataRow);
+
+                        var textProgress = successInsert + ' of ' + totalRow + ' row inserted';
+                        var width = Math.round((successInsert / totalRow) * 100);
+                        $('#process_data').text(textProgress);
+                        $('.progress-bar').css('width', width + '%');
+
+                        if (successInsert == totalData) {
+                            swal("Success!", "Finish Import Row", "success");
+                            $('.btn').prop('disabled', false);
+                            return true;
+
+                        } else {
+
+                            start_import_sales(data[arrayInsert]);
+
+                        }
+                    } else {
+                        return true;
+
+                    }
+                }
+            })
+        }
+    })
+</script>

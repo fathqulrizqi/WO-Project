@@ -1,0 +1,389 @@
+﻿@{
+    ViewBag.Title = "Niterra Portal";
+    ViewBag.Nav = "partialNavMain";
+}
+
+@section scriptHead{
+    <script src="@Url.Content("~/Scripts/jssor.slider/js/jssor.slider.min.js?v=" + DateTime.Now.TimeOfDay)"></script>
+    <script type="text/javascript">
+        $(document).ready(function () {
+            if ($('#mainBodySlider').length > 0) {
+
+                var options = {
+                    $AutoPlay: true,
+                    $Loop: 1,
+                    $DragOrientation: 1,                                //[Optional] Orientation to drag slide, 0 no drag, 1 horizontal, 2 vertical, 3 either, default value is 1 (Note that the $DragOrientation should be the same as $PlayOrientation when $Cols is greater than 1, or parking position is not 0)
+                    $SlideDuration: 500,                                //[Optional] Specifies default duration (swipe) for slide in milliseconds, default value is 500
+                    $SlideSpacing: 5, 					                //[Optional] Space between each slide in pixels, default value is 0
+                    $FillMode: 2,
+                    $BulletNavigatorOptions: {                                //[Optional] Options to specify and enable navigator or not
+                        $Class: $JssorBulletNavigator$,                       //[Required] Class to create navigator instance
+                        $ChanceToShow: 2,                               //[Required] 0 Never, 1 Mouse Over, 2 Always
+                        $AutoCenter: 1,                                 //[Optional] Auto center navigator in parent container, 0 None, 1 Horizontal, 2 Vertical, 3 Both, default value is 0
+                        $Steps: 1,                                      //[Optional] Steps to go for each navigation request, default value is 1
+                        $Rows: 1,                                      //[Optional] Specify lanes to arrange items, default value is 1
+                        $SpacingX: 8,                                   //[Optional] Horizontal space between each item in pixel, default value is 0
+                        $SpacingY: 8,                                   //[Optional] Vertical space between each item in pixel, default value is 0
+                        $Orientation: 1                                 //[Optional] The orientation of the navigator, 1 horizontal, 2 vertical, default value is 1
+                    },
+                    $ArrowNavigatorOptions: {                       //[Optional] Options to specify and enable arrow navigator or not
+                        $Class: $JssorArrowNavigator$,              //[Requried] Class to create arrow navigator instance
+                        $ChanceToShow: 2,                               //[Required] 0 Never, 1 Mouse Over, 2 Always
+                        $AutoCenter: 2,                                 //[Optional] Auto center arrows in parent container, 0 No, 1 Horizontal, 2 Vertical, 3 Both, default value is 0
+                        $Steps: 1                                       //[Optional] Steps to go for each navigation request, default value is 1
+                    }
+                };
+
+                var jssor_slider1 = new $JssorSlider$("mainBodySlider", options);
+
+                function ScaleSlider() {
+                    var parentWidth = $('#mainBodySlider').parent().width();
+                    if (parentWidth) {
+                        jssor_slider1.$ScaleWidth(parentWidth);
+                    } else {
+                        window.setTimeout(ScaleSlider, 30);
+                    }
+                }
+                $(".imgMainSlider:not([data-content='0'])").click(function () {
+                    var currID = $(this).data("id");
+                    var win = window.open('/NGKBusi/Other/Slider/Content?id=' + currID, '_blank');
+                    if (win) {
+                        //Browser has allowed it to be opened
+                        win.focus();
+                    } else {
+                        //Browser has blocked it
+                        alert('Please allow popups for this website');
+                    }
+                });
+
+                ScaleSlider();
+
+                $(window).on("load", ScaleSlider);
+                $(window).on("resize", ScaleSlider);
+                $(window).on("orientationchange", ScaleSlider);
+            }
+        });
+    </script>
+}
+
+@section cssHead{
+    <style type="text/css">
+        .jssora12l, .jssora12r {
+            display: block;
+            position: absolute;
+            /* size of arrow element */
+            width: 30px;
+            height: 46px;
+            cursor: pointer;
+            background: url("/NGKbusi/Scripts/jssor.slider/img/a12.png") no-repeat;
+            overflow: hidden;
+        }
+
+        .jssorb055 .i {
+            position: absolute;
+            cursor: pointer;
+        }
+
+            .jssorb055 .i .b {
+                fill: #fff;
+                fill-opacity: 0.5;
+            }
+
+            .jssorb055 .i:hover .b {
+                fill-opacity: .7;
+            }
+
+        .jssorb055 .iav .b {
+            fill-opacity: 1;
+        }
+
+        .jssorb055 .i.idn {
+            opacity: .3;
+        }
+
+        .jssora22l, .jssora22r {
+            display: block;
+            position: absolute;
+            /* size of arrow element */
+            width: 40px;
+            height: 58px;
+            cursor: pointer;
+            background: url("/NGKbusi/Scripts/jssor.slider/img/a22.png") center center no-repeat;
+            overflow: hidden;
+        }
+
+        .jssora22l {
+            background-position: -10px -31px;
+        }
+
+        .jssora22r {
+            background-position: -70px -31px;
+        }
+
+        .jssora22l:hover {
+            background-position: -130px -31px;
+        }
+
+        .jssora22r:hover {
+            background-position: -190px -31px;
+        }
+
+        .jssora22l.jssora22ldn {
+            background-position: -250px -31px;
+        }
+
+        .jssora22r.jssora22rdn {
+            background-position: -310px -31px;
+        }
+
+        .jssora22l.jssora22lds {
+            background-position: -10px -31px;
+            opacity: .3;
+            pointer-events: none;
+        }
+
+        .jssora22r.jssora22rds {
+            background-position: -70px -31px;
+            opacity: .3;
+            pointer-events: none;
+        }
+
+        .imgMainSlider:not([data-content='0']) {
+            cursor: pointer;
+        }
+
+
+        /* info box */
+        .info-box {
+            /*box-shadow: 0 0 1px rgb(0 0 0 / 13%), 0 1px 3px rgb(0 0 0 / 20%);*/
+            box-shadow: 0 0 1px rgb(0 117 128 / 70%), 0 1px 3px rgb(0 117 128 / 75%);
+            border-radius: 0.25rem;
+            background-color: #fff;
+            display: -ms-flexbox;
+            display: flex;
+            margin-bottom: 1rem;
+            min-height: 80px;
+            padding: 0.5rem;
+            position: relative;
+            width: 100%;
+        }
+
+            .info-box .info-box-icon {
+                border-radius: 0.25rem;
+                -ms-flex-align: center;
+                align-items: center;
+                display: -ms-flexbox;
+                display: flex;
+                font-size: 1.875rem;
+                -ms-flex-pack: center;
+                justify-content: center;
+                text-align: center;
+                width: 70px;
+            }
+
+            .info-box .info-box-content, .info-box .info-box-content > a, .info-box .info-box-content > a:hover, .info-box .info-box-content > a:link {
+                display: -ms-flexbox;
+                display: flex;
+                -ms-flex-direction: column;
+                flex-direction: column;
+                -ms-flex-pack: center;
+                justify-content: center;
+                line-height: 1.8;
+                -ms-flex: 1;
+                flex: 1;
+                padding: 0 10px;
+                overflow: hidden;
+            }
+
+            .info-box .info-box-text, .info-box .progress-description, .info-box .info-box-text > a {
+                display: block;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+            }
+
+
+            .info-box .info-box-number {
+                display: block;
+                margin-top: 0.25rem;
+                font-weight: 700;
+            }
+
+            .info-box .info-box-icon {
+                border-radius: 0.25rem;
+                -ms-flex-align: center;
+                align-items: center;
+                display: -ms-flexbox;
+                display: flex;
+                font-size: 1.875rem;
+                -ms-flex-pack: center;
+                justify-content: center;
+                text-align: center;
+                width: 70px;
+            }
+
+        .bg-info, .bg-info > a {
+            color: #fff !important;
+        }
+
+        a:hover {
+            text-decoration: none;
+        }
+
+        a:hover, a:visited, a:link, a:active {
+            color: black
+        }
+
+        body {
+            background-color: #f4f4f5;
+            background-image: url('@Url.Content("~/Images/niterra-bg.jpg")');
+            background-size: cover;
+}
+
+        .card-header {
+                            text-align: center;
+                            font-weight: bold;
+                        color: white;
+                            font-size: 18px;
+                        }
+        .card-body {
+                        padding :0px;
+                        }
+    </style>
+}
+@if ((ViewBag.MainSlider as List<NGKBusi.Models.Sliders>).Count() > 0)
+{
+    <div id="mainSlider" style="margin: 0px;">
+        <div id="mainBodySlider" style="position: relative; margin: 0px auto; top: 0px; left: 0px; width: 940px; height: 500px; overflow: hidden;">
+            <!-- Loading Screen -->
+            <div data-u="loading" style="position: absolute; top: 0px; left: 0px;">
+                <div style="filter: alpha(opacity=70); opacity: 0.7; position: absolute; display: block; top: 0px; left: 0px; width: 100%; height: 100%;"></div>
+                <div style="position:absolute;display:block;background:url('/NGKbusi/Scripts/jssor.slider/img/loading.gif') no-repeat center center;top:0px;left:0px;width:100%;height:100%;"></div>
+            </div>
+            <div data-u="slides" style="cursor: default; position: relative; top: 0px; left: 0px; width: 940px; height: 500px; overflow: hidden;">
+                @foreach (var item in ViewBag.MainSlider)
+                {
+                    <div><img src="@(item.Path)" alt="main Slider" class="img-fluid imgMainSlider" data-id="@(item.ID)" data-content="@(!String.IsNullOrEmpty(item.Content)?1:0)" title="@(!String.IsNullOrEmpty(item.Content)?"Click for more detail":"")"></div>
+                }
+            </div>
+            <!-- Bullet Navigator -->
+            <div data-u="navigator" class="jssorb055" style="position:absolute;bottom:12px;left:350px;" data-scale="0.5" data-scale-bottom="0.75">
+                <div data-u="prototype" class="i" style="width:16px;height:16px;">
+                    <svg viewBox="0 0 16000 16000" style="position:absolute;top:0;left:0;width:100%;height:100%;">
+                        <rect class="b" x="2200" y="2200" width="11600" height="11600"></rect>
+                    </svg>
+                </div>
+            </div>
+            <!-- Arrow Navigator -->
+            <span data-u="arrowleft" class="jssora22l" style="top:0px;left:12px;width:40px;height:58px;" data-autocenter="2"></span>
+            <span data-u="arrowright" class="jssora22r" style="top:0px;right:12px;width:40px;height:58px;" data-autocenter="2"></span>
+        </div>
+        <!-- Trigger -->
+    </div>
+}
+else
+{
+    @*<div class="jumbotron" style="background-color:white">
+            <h1>Niterra Portal</h1>
+        </div>*@
+    @*<div class="text-center">
+            <img src="~/Images/Main/Continous Improvement - Contest.png" class="img-fluid" />
+        </div>*@
+
+    <!-- info box -->
+    if (ViewBag.FavoriteMenu != null)
+    {
+        <div class="row">
+            <div class="col-8">
+                <div class="row">
+                    @foreach (var item in ViewBag.FavoriteMenu)
+                    {
+
+                        <div class="col-md-4 col-sm-6">
+                            <a href="@Url.Action(@item.action, @item.controller, new { area = @item.area })">
+                                <div class="info-box">
+                                    <span class="info-box-icon bg-info"><i class="far fa-star"></i></span>
+
+                                    <div class="info-box-content">
+                                        <span class="info-box-text">@item.area</span>
+                                        <span class="info-box-number">@item.name</span>
+                                    </div>
+                                    <!-- /.info-box-content -->
+                                </div>
+                            </a>
+                            <!-- /.info-box -->
+                        </div>
+                    }
+                </div>
+            </div>
+
+            <div class="col-sm-4">
+
+                @*@if (ViewBag.TaskList != null && Enumerable.Count(ViewBag.TaskList) > 0)*@
+                @if (ViewBag.TaskList != null)
+                {
+                    <div class="card">
+                        <div class="card-header bg-primary">Task List</div>
+                        <div class="card-body">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th scope="col">No.</th>
+                                        <th scope="col">Module</th>
+                                        <th scope="col">Task</th>
+                                        <th scope="col"></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @{
+                                        int no = 0;
+                                        foreach (var itemTask in ViewBag.TaskList)
+                                        {
+                                            no++;
+                                            string url = "";
+                                            string controllerName = itemTask.ModuleController;
+                                            string actionName = itemTask.Module;
+                                            string areaName = itemTask.ModuleArea;
+                                            // Variabel untuk nama parameter dan nilai parameter
+                                            string paramName = itemTask.ModuleParameter;
+                                            string paramValue = itemTask.ModuleID;
+
+
+                                            var routeValues = new System.Web.Routing.RouteValueDictionary();
+                                            routeValues.Add("area", areaName); // Menambahkan "area" ke routeValues
+                                            routeValues.Add("controller", controllerName);
+                                            routeValues.Add("action", actionName);
+                                            routeValues.Add(paramName, paramValue);
+
+                                            <tr>
+                                                <th scope="row">@no</th>
+                                                <td>@(itemTask.ModuleController) @itemTask.ModuleParameter</td>
+                                                <td>@itemTask.TaskName</td>
+                                                <td><a href="@Url.Action(actionName, controllerName, routeValues)"><span><i class="fa fa-eye"></i></span></a></td>
+                                            </tr>
+
+                                        }
+                                    }
+                                </tbody>
+                                @{ if (no == 0)
+                                    {
+                                        <tfoot>
+                                            <tr><th colspan="3" style="text-align:center"><h3>Empty Task</h3></th></tr>
+                                        </tfoot>
+                                    }
+                                }
+                            </table>
+                        </div>
+                    </div>
+
+                }
+            </div>
+        </div>
+    }
+
+    <div class="row ">
+
+    </div>
+
+}
+

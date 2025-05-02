@@ -1,0 +1,144 @@
+﻿@using NGKBusi.Models
+@using NGKBusi.Controllers
+
+@model Users
+
+@{
+    ViewBag.Title = "Log in";
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!--===============================================================================================-->
+    <link rel="icon" type="image/png" href="images/icons/favicon.ico" />
+    <!--===============================================================================================-->
+    <link rel="stylesheet" type="text/css" href="@Url.Content("~/Content/bootstrap/css/bootstrap.min.css")">
+    <!--===============================================================================================-->
+    <link rel="stylesheet" type="text/css" href="@Url.Content("~/Content/font-awesome/css/font-awesome.min.css")">
+    <!--===============================================================================================-->
+    <link rel="stylesheet" type="text/css" href="@Url.Content("~/Content/Login_v18/fonts/Linearicons-Free-v1.0.0/icon-font.min.css")">
+    <!--===============================================================================================-->
+    <link rel="stylesheet" type="text/css" href="@Url.Content("~/Content/Login_v18/vendor/animate/animate.css")">
+    <!--===============================================================================================-->
+    <link rel="stylesheet" type="text/css" href="@Url.Content("~/Content/Login_v18/vendor/css-hamburgers/hamburgers.min.css")">
+    <!--===============================================================================================-->
+    <link rel="stylesheet" type="text/css" href="@Url.Content("~/Content/Login_v18/vendor/animsition/css/animsition.min.css")">
+    <!--===============================================================================================-->
+    <link rel="stylesheet" type="text/css" href="@Url.Content("~/Content/Login_v18/vendor/select2/select2.min.css")">
+    <!--===============================================================================================-->
+    <link rel="stylesheet" type="text/css" href="@Url.Content("~/Content/Login_v18/vendor/daterangepicker/daterangepicker.css")">
+    <!--===============================================================================================-->
+    <link rel="stylesheet" type="text/css" href="@Url.Content("~/Content/Login_v18/css/util.css")">
+    <link rel="stylesheet" type="text/css" href="@Url.Content("~/Content/Login_v18/css/main.css?v=2")">
+    <!--===============================================================================================-->
+    <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+    <style>
+        .img_qrcode {           
+            bottom: 8px;
+            max-width:45%;
+            margin-top:5%
+        }
+    </style>
+</head>
+<body style="background-color: #666666;">
+
+    <div class="limiter">
+        <div class="container-login100">
+            <div class="wrap-login100">
+
+                @using (Html.BeginForm("Login", "User", new { ReturnUrl = ViewBag.ReturnUrl }, FormMethod.Post, new { @class = "login100-form validate-form", role = "form" }))
+                {
+                    @Html.AntiForgeryToken()
+                    <span class="login100-form-title p-b-43">
+                        <img class="logo" src="@Url.Content("~/Images/niterra-id.png")" />
+                    </span>
+
+                    <span class="login100-form-title p-b-43">
+                        Login to Portal
+                    </span>
+
+                    @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+                    <div class="wrap-input100 validate-input" data-validate="NIK is required">
+                        @Html.TextBoxFor(m => m.NIK, new { @class = "input100 has-val" })
+                        <span class="focus-input100"></span>
+                        <span class="label-input100">NIK</span>
+                        @Html.ValidationMessageFor(m => m.NIK, "", new { @class = "text-danger" })
+                    </div>
+
+                    <div class="wrap-input100 validate-input" data-validate="Password is required">
+                        @Html.PasswordFor(m => m.Password, new { @class = "input100 has-val", autocomplete = "off" })
+                        <span class="focus-input100"></span>
+                        <span class="label-input100">Password</span>
+                        @Html.ValidationMessageFor(m => m.Password, "", new { @class = "text-danger" })
+                    </div>
+                    if (InternetCS.IsConnectedToInternet())
+                    {
+                        <div style="margin-top:10px; margin-bottom:10px">
+                            <div class="g-recaptcha" data-sitekey="6LfoyyoqAAAAAKg-ocYxO3S53_PysEXjvRQ_ycyQ"></div>
+                        </div>
+                    }
+                    <!--<div class="flex-sb-m w-full p-t-3 p-b-32">
+                    <div class="contact100-form-checkbox">
+                        <input class="input-checkbox100" id="ckb1" type="checkbox" name="remember-me">
+                        <label class="label-checkbox100" for="ckb1">
+                            Remember me
+                        </label>
+                    </div>-->
+
+                    @*<div>
+                            <a href="#" class="txt1">
+                                Forgot Password?
+                            </a>
+                        </div>*@
+                    <!--</div>-->
+
+                    <div class="container-login100-form-btn">
+                        <button class="login100-form-btn">
+                            Login
+                        </button>
+                    </div>
+                    <span class="login100-form-title p-b-43">
+                        <img class="qr_image" src="~/Images/QR Code Whistleblowing Niterra.png" />
+                    </span>
+
+
+                }
+                <div class="login100-more" style="background-image: url('../Images/6221846.jpg');">
+
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+
+
+    <!--===============================================================================================-->
+    <script src="@Url.Content("~/Content/Login_v18/vendor/jquery/jquery-3.2.1.min.js")"></script>
+    <!--===============================================================================================-->
+    <script src="@Url.Content("~/Content/Login_v18/vendor/animsition/js/animsition.min.js")"></script>
+    <!--===============================================================================================-->
+    <script src="@Url.Content("~/Content/Login_v18/vendor/bootstrap/js/popper.js")"></script>
+    <script src="@Url.Content("~/Content/Login_v18/vendor/bootstrap/js/bootstrap.min.js")"></script>
+    <!--===============================================================================================-->
+    <script src="@Url.Content("~/Content/Login_v18/vendor/select2/select2.min.js")"></script>
+    <!--===============================================================================================-->
+    <script src="@Url.Content("~/Content/Login_v18/vendor/daterangepicker/moment.min.js")"></script>
+    <script src="@Url.Content("~/Content/Login_v18/vendor/daterangepicker/daterangepicker.js")"></script>
+    <!--===============================================================================================-->
+    <script src="@Url.Content("~/Content/Login_v18/vendor/countdowntime/countdowntime.js")"></script>
+    <!--===============================================================================================-->
+    <script src="@Url.Content("~/Content/Login_v18/js/main.js")"></script>
+
+    <script>
+        $('document').ready(function () {
+            $('.input100').val("");
+        });
+    </script>
+</body>
+</html>
