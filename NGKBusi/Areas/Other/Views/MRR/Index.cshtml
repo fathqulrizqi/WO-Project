@@ -927,6 +927,8 @@
                         url: "@Url.Action("UpdateSchedule", "MRR", new { area = "Other" })",
                         type: "POST",
                         data: formDataUpdate,
+                        tryCount: 0,
+                        tryLimit: 3,
                         contentType: false,
                         processData: false,
                         dataType: "json",
@@ -1095,6 +1097,8 @@
                     $.ajax({
                         type: 'POST',
                         url: "@Url.Action("SubmitRequest", "MRR", new { area = "Other" })",
+                          tryCount: 0,
+            tryLimit: 3,
                         data: submitForm,
                         cache: false,
                         contentType: false,
@@ -1212,6 +1216,8 @@
     $.ajax({
         url: "@Url.Action("GetRoomDetails", "MRR", new { area = "Other" })",
         type: "POST",
+        tryCount: 0,
+        tryLimit: 3,
         data: { ID: roomCat },
         dataType: "json",
         success: function (response) {
@@ -1244,7 +1250,14 @@
                 renderCalendar(response[0]?.ID);
             }
         },
-        error: function () {
+        error: function (textStatus) {
+            if (textStatus === "timeout") {
+                this.tryCount++;
+                if (this.tryCount <= this.tryLimit) {
+                    $.ajax(this);
+                    return;
+                }
+            }
             alert("Failed to fetch data.");
         }
     });
@@ -1405,26 +1418,28 @@
             <div class="p-3" style="height: 653.45px; min-width: 275px; background-color: white; border-radius: 20px;">
                 <div class="col justify-content-evenly d-flex justify-center mt-4">
 
-                    <div class="category text-center" data-room="frontOffice">
-                        <a href="#" class="link-dark category-icon" style="text-decoration: none;" id="frontOfficeIcon">
+                    <a href="#" class="link-dark category-icon" style="text-decoration: none;" id="frontOfficeIcon">
+                        <div class="category text-center" data-room="frontOffice">
+
                             <i class="fa fa-building fa-4x"></i>
                             <p class="mt-2">Front Office</p>
+                        </div>
+                    </a>
 
-                        </a>
-                    </div>
+                    <a href="#" class="link-dark category-icon" style="text-decoration: none;" id="centralBuildingIcon">
+                        <div class="category text-center" data-room="centralBuilding">
 
-                    <div class="category text-center" data-room="centralBuilding">
-                        <a href="#" class="link-dark category-icon" style="text-decoration: none;" id="centralBuildingIcon">
                             <i class="fa fa-building fa-4x"></i>
                             <p class="mt-2">Central Building</p>
-                        </a>
-                    </div>
-                    <div class="category text-center" data-room="production">
-                        <a href="#" class="link-dark category-icon" style="text-decoration: none;" id="productionIcon">
+                        </div>
+                    </a>
+                    <a href="#" class="link-dark category-icon" style="text-decoration: none;" id="productionIcon">
+                        <div class="category text-center" data-room="production">
+
                             <i class="fa fa-building fa-4x"></i>
                             <p class="mt-2">Production</p>
-                        </a>
-                    </div>
+                        </div>
+                    </a>
                 </div>
 
                 <div id="carouselExampleFade" class="carousel slide carousel-fade mt-4">
