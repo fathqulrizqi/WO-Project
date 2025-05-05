@@ -927,10 +927,13 @@
     <Content Include="Content\bootstrap\css\bootstrap-reboot.min.css" />
     <Content Include="Content\bootstrap\css\bootstrap.css" />
     <Content Include="Content\bootstrap\css\bootstrap.min.css" />
+    <Content Include="Content\bootstrap\css\bootstrap5.3.3\bootstrap.min.css" />
     <Content Include="Content\bootstrap\js\bootstrap.bundle.js" />
     <Content Include="Content\bootstrap\js\bootstrap.bundle.min.js" />
     <Content Include="Content\bootstrap\js\bootstrap.js" />
     <Content Include="Content\bootstrap\js\bootstrap.min.js" />
+    <Content Include="Content\bootstrap\js\bootstrap5.3.2\bootstrap.bundle.min.js" />
+    <Content Include="Content\bootstrap\js\bootstrap5.3.3\bootstrap.bundle.min.js" />
     <Content Include="Content\clockpicker\bootstrap-clockpicker.css" />
     <Content Include="Content\clockpicker\bootstrap-clockpicker.min.css" />
     <Content Include="Content\clockpicker\jquery-clockpicker.css" />
@@ -3396,6 +3399,7 @@
     <Content Include="Content\fresh-bootstrap-table\js\demo\demo.js" />
     <Content Include="Content\fresh-bootstrap-table\js\demo\gsdk-switch.js" />
     <Content Include="Content\fresh-bootstrap-table\js\demo\jquery.sharrre.js" />
+    <Content Include="Content\FullCalendar\index.global.min.js" />
     <Content Include="Content\handsontable\handsontable.css" />
     <Content Include="Content\handsontable\handsontable.full.css" />
     <Content Include="Content\handsontable\ht-theme-main-min.css" />
@@ -3719,6 +3723,8 @@
     <Content Include="Content\Sign\611.08.11.png" />
     <Content Include="Content\Sign\719.04.15.png" />
     <Content Include="Content\Sign\767.11.16.png" />
+    <Content Include="Content\sweetalert2\sweetalert2%4011.js" />
+    <Content Include="Content\sweetalert2\sweetalert2.min.css" />
     <Content Include="Content\sweetalert\sweetalert-dev.js" />
     <Content Include="Content\sweetalert\sweetalert.css" />
     <Content Include="Content\sweetalert\sweetalert.min.js" />
@@ -3812,6 +3818,7 @@
     <Content Include="Files\SCM\Sparepart\Images\P103136057-8.jpg" />
     <Content Include="Files\SCM\Sparepart\Images\shs-c.jpg" />
     <Content Include="fonts\glyphicons-halflings-regular.svg" />
+    <Content Include="fonts\Inter\css2.css" />
     <Content Include="Global.asax" />
     <Content Include="Content\Site.css" />
     <Content Include="Images\Corona\Corona1.jpeg" />
@@ -6476,6 +6483,7 @@
     <Content Include="Scripts\moment-with-locales.min.js" />
     <Content Include="Scripts\moment.js" />
     <Content Include="Scripts\moment.min.js" />
+    <Content Include="Scripts\moment2.29.1\moment.min.js" />
     <Content Include="Scripts\MTN\MachineDatabase.js" />
     <Content Include="Scripts\MTN\MaintenanceChecklist.js" />
     <Content Include="Scripts\MTN\MaintenanceSchedule.js" />
