@@ -1,9 +1,422 @@
 ﻿
 @{
-    ViewBag.Title = "WorkingOrderView";
+    ViewBag.Title = "Working Order";
     Layout = "~/Views/Shared/_Layout.cshtml";
 
 }
 
-<h2>Working Order View</h2>
+@section cssHead {
+    <link rel="stylesheet"
+          href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css" />
+    <link rel="stylesheet"
+          href="https://cdn.datatables.net/2.3.0/css/dataTables.bootstrap5.css" />
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.3/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-x..." crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <style>
+        .page-content {
+            padding-top: 0 !important;
+        }
 
+        .dt-length {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-left: 5px;
+            gap: 0.5rem;
+            font-size: 0.875rem;
+            color: #374151;
+        }
+
+            .dt-length select {
+                padding: 5px 10px 5px 2.5rem;
+                font-size: 0.875rem;
+                color: #111827;
+                border: 1px solid #d1d5db;
+                border-radius: 0.5rem;
+                background-color: #f9fafb;
+                background-image: url("data:image/svg+xml,%3Csvg fill='gray' viewBox='0 0 20 20' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath fill-rule='evenodd' d='M5.23 7.21a.75.75 0 011.06.02L10 11.178l3.71-3.947a.75.75 0 111.08 1.04l-4.24 4.51a.75.75 0 01-1.08 0L5.21 8.27a.75.75 0 01.02-1.06z' clip-rule='evenodd'/%3E%3C/svg%3E");
+                background-repeat: no-repeat;
+                background-position: 0.75rem center;
+                background-size: 1rem 1rem;
+                display: none;
+            }
+
+            .dt-length label {
+                display: flex;
+                justify-content: center;
+                align-content: center;
+            }
+
+        div.dataTables_wrapper .dataTables_length,
+        div.dataTables_wrapper .dataTables_filter {
+            display: flex;
+            align-items: center;
+        }
+
+        div.dataTables_wrapper .dataTables_length,
+        div.dataTables_wrapper .dataTables_filter {
+            margin-bottom: 0.5rem;
+        }
+
+        div.dataTables_wrapper .dataTables_length {
+            order: 1;
+            width: 100%;
+        }
+
+        .dt-search {
+            display: flex;
+            margin: 0;
+            max-width: 150px;
+            padding: 4px 0;
+        }
+
+            .dt-search > label {
+                font-size: 0;
+                position: relative;
+                display: block;
+            }
+
+            .dt-search input[type="search"] {
+                display: flex;
+                width: 100%;
+                padding: 0.5rem 0.75rem 0.5rem 2.5rem;
+                margin-right: 5px;
+                font-size: 0.875rem;
+                color: #111827;
+                border: 1px solid #d1d5db;
+                border-radius: 0.5rem;
+                background-color: #f9fafb;
+                background-image: url("data:image/svg+xml,%3Csvg fill='gray' viewBox='0 0 20 20' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath fill-rule='evenodd' d='M12.9 14.32a8 8 0 111.414-1.414l5.387 5.387a1 1 0 01-1.414 1.414l-5.387-5.387zM14 8a6 6 0 11-12 0 6 6 0 0112 0z' clip-rule='evenodd'%3E%3C/path%3E%3C/svg%3E");
+                background-repeat: no-repeat;
+                background-position: 0.75rem center;
+                background-size: 1rem 1rem;
+                outline: none;
+            }
+
+                .dt-search input[type="search"]::placeholder {
+                    color: #6b7280;
+                    font-size: 0.875rem;
+                }
+
+        .myTable-topbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        #myTable_length select {
+            padding: 4px 10px 4px 40px;
+            font-size: 14px;
+            color: #111827;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            background-color: #f9fafb;
+            background-image: url("data:image/svg+xml,%3Csvg fill='gray' viewBox='0 0 20 20' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath fill-rule='evenodd' d='M5.23 7.21a.75.75 0 011.06.02L10 11.178l3.71-3.947a.75.75 0 111.08 1.04l-4.24 4.51a.75.75 0 01-1.08 0L5.21 8.27a.75.75 0 01.02-1.06z' clip-rule='evenodd'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: 12px center;
+            background-size: 16px 16px;
+            outline: none;
+            display: none;
+        }
+
+        .dataTables_length {
+            display: flex;
+        }
+
+        .dataTables_wrapper .myTable-topbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+
+        #dt-search-0 label {
+            font-size: 0;
+            position: relative;
+            display: block;
+            margin-bottom: 5px;
+            margin-right: 5px;
+        }
+
+        #dt-search-0 input[type="search"] {
+            display: block;
+            width: 100%;
+            padding: 0.5rem 0.75rem 0.5rem 2.5rem;
+            font-size: 0.875rem;
+            color: #111827;
+            border: 1px solid #d1d5db;
+            border-radius: 0.5rem;
+            background-color: #f9fafb;
+            background-image: url("data:image/svg+xml,%3Csvg fill='gray' viewBox='0 0 20 20' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath fill-rule='evenodd' d='M12.9 14.32a8 8 0 111.414-1.414l5.387 5.387a1 1 0 01-1.414 1.414l-5.387-5.387zM14 8a6 6 0 11-12 0 6 6 0 0112 0z' clip-rule='evenodd'%3E%3C/path%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: 0.75rem center;
+            background-size: 1rem 1rem;
+            outline: none;
+        }
+
+            #dt-search-0 input[type="search"]::placeholder {
+                color: #6b7280;
+                font-size: 0.875rem;
+            }
+
+        table {
+            width: 100%;
+            table-layout: fixed;
+        }
+
+        .dataTables_scrollBody {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+    </style>
+
+}
+
+@section scriptHead {
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.7.1.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.3/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.datatables.net/2.3.0/js/dataTables.js"></script>
+    <script src="https://cdn.datatables.net/2.3.0/js/dataTables.bootstrap5.js"></script>
+    <script>
+        $(document).ready(function () {
+            const table = $("#myTable").DataTable({
+                search: {
+                    return: true,
+                },
+                ajax: {
+            url: '@Url.Action("GetDatas", "WorkingOrder", new { area = "Purchasing" })',
+                    type: 'GET',
+                    dataSrc: 'datas'
+        },
+
+                columns: [
+            {
+                        data: 'Date',
+                title: 'Date',
+                render: function(data) {
+                    if (data && data.indexOf('/Date(') >= 0) {
+                        return new Date(parseInt(data.substr(6))).toLocaleDateString();
+                    }
+                    return data;
+                }
+            },
+            { title: 'Number', data: 'Number' },
+            { title: 'Vendor',  data: 'Vendor' },
+            { title: 'Subject', data: 'Subject' },
+            { title: 'User', data: 'NIK' },
+            {
+                data: null,
+                title: 'Action',
+                searchable: false,
+                orderable: false,
+                render: function (data, type, row) {
+                    return `
+                        <button class="btn btn-pdf" data-id="${row.ID}"><i class="fa-solid fa-file-pdf" style="color: #2C3E50;"></i></button>
+                        <button class="btn btn-edit" data-id="${row.ID}"><i class="fa-solid fa-edit" style="color: orange;"></i></button>
+                        <button class="btn btn-delete" data-id="${row.ID}"><i class="fa-solid fa-trash" style="color: #E74C3C;"></i></button>
+                    `;
+                }
+            }
+        ],
+                initComplete: function () {
+                    this.api()
+                        .columns()
+                        .every(function () {
+                            var column = this;
+                            var title = column.header().textContent;
+
+                            if (column.index() !== 6) {
+                                $('<input style="width: 100%; padding: 0.5rem 0.75rem; background-color: white; margin-top: 5px; border: 1px #6B7884 solid; border-radius: 5px;" class="dt-search" type="text" placeholder="Search ' + title + '" />')
+                                    .appendTo($(column.footer()))
+                                    .on("keyup change clear", function () {
+                                        column.search(this.value).draw();
+                                    });
+                            }
+                        });
+                },
+                layout: {
+                    topStart: "pageLength",
+                    bottom: "paging",
+                    bottomStart: null,
+                    bottomEnd: null,
+                },
+                language: {
+                    searchPlaceholder: "Search all tables...",
+                    search: "",
+                },
+            });
+
+            $('#myTable thead').on('keyup change', 'input', function () {
+                const colIdx = $(this).parent().index();
+                table.column(colIdx).search(this.value).draw();
+            });
+
+            $('#myTable').on('click', '.btn-edit', function () {
+                const rowId = $(this).data('id');
+                alert('Edit button clicked for row with ID: ' + rowId);
+            });
+
+            $('#myTable').on('click', '.btn-delete', function () {
+                const rowId = $(this).data('id');
+                alert('Delete button clicked for row with ID: ' + rowId);
+            });
+
+            $('#myTable').on('click', '.btn-pdf', function () {
+                const rowId = $(this).data('id');
+                alert('PDF button clicked for row with ID: ' + rowId);
+            });
+
+
+            $('#createWObutton').on('click', function () {
+                $('#createWOModal').modal('show');
+            });
+
+        });
+    </script>
+}
+
+<div class="d-flex align-items-center rounded" style="color: #2C3E50;">
+    <span style="color: #F6AA04; font-weight: bold; font-size: 20px; margin: 20px;">|</span>
+    <h2 style="font-weight: bold; margin: 0; font-size: 20px">
+        Working Order
+    </h2>
+</div>
+
+<div class="max-w-full mx-auto bg-white p-6 rounded-xl shadow-lg">
+    <button id="createWObutton" class="btn btn-primary" type="button">Create Working Order</button>
+    <div class="overflow-x-auto">
+        <table id="myTable" class="hover min-w-full text-sm text-left text-gray-500">
+            <thead class="text-xs text-gray-700 uppercase bg-gray-50">
+
+            </thead>
+            <thead>
+                <tr>
+                    <th><input style="padding: 4px 6px; font-size: 12px;" type="text" placeholder="Search Date" class="dt-search" /></th>
+                    <th><input style="padding: 4px 6px; font-size: 12px;" type="text" placeholder="Search Number" class="dt-search" /></th>
+                    <th><input style="padding: 4px 6px; font-size: 12px;" type="text" placeholder="Search Vendor" class="dt-search" /></th>
+                    <th><input style="padding: 4px 6px; font-size: 12px;" type="text" placeholder="Search Subject" class="dt-search" /></th>
+                    <th><input style="padding: 4px 6px; font-size: 12px;" type="text" placeholder="Search User" class="dt-search" /></th>
+                    <th></th>
+                </tr>
+            </thead>
+
+            <tbody>
+            </tbody>
+
+        </table>
+    </div>
+</div>
+
+<div class="modal fade" id="createWOModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header" style="background-color: #007582;">
+                <h1 class="modal-title fs-5" style="color: white; font-weight:bold;" id="exampleModalLabel">Create Workspace Reservation</h1>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+            <form id="formWO" class="needs-validation" action="#" method="POST" novalidate>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <div class="row mb-3">
+                            <input type="hidden" id="idEvent" name="idBook" value="0" />
+                            <div class="col-2">
+                                <label for="NIK" class="form-label">By</label>
+                            </div>
+                            <div class="col-10">
+                                <input type="text" class="form-control" id="NIK" value="@ViewBag.currUsr" readonly>
+                            </div>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-2">
+                                <label for="date" class="form-label">Date</label>
+                                <span style="color: red;">*</span>
+                            </div>
+                            <div class="col-10">
+                                <input type="text" class="form-control" id="date" name="Day" required>
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-2">
+                                <label for="starttime" class="form-label">Schedule</label>
+                                <span style="color: red;">*</span>
+                            </div>
+                            <div class="col-5">
+                                <input type="text" class="form-control" id="starttime" name="StartTime" required>
+                            </div>
+                            <div class="col-5">
+                                <input type="text" class="form-control" id="endtime" name="EndTime" required>
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-2">
+                                <label for="roomTitle" class="form-label">Workspace</label>
+                            </div>
+                            <div class="col-10">
+                                <input type="text" class="form-control" id="roomTitle" readonly>
+                                <input type="hidden" id="roomIdHidden" name="Roomid" />
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-2">
+                                <label for="subject" class="form-label">Subject</label>
+                                <span style="color: red;">*</span>
+                            </div>
+                            <div class="col-10">
+                                <textarea class="form-control" id="subject" rows="3" style="resize:none;" name="Subject" placeholder="Please write your reservation purpose..." required></textarea>
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-2">
+                                <label class="form-label">Total Attendance</label>
+                                <span style="color: red;">*</span>
+                            </div>
+                            <div class="col-1">
+                                <input type="number" class="form-control" id="attendance" name="Attendance" min="1" required />
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-2">
+                                <label class="form-label">Google Calendar Url</label>
+                            </div>
+                            <div class="col-10">
+                                <textarea class="form-control" id="link" name="Link" rows="3" style="resize:none;"></textarea>
+
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-2">
+                                <label for="linkmeet" class="form-label">Google Meet Url</label>
+                            </div>
+                            <div class="col-10">
+                                <textarea class="form-control" id="linkmeet" rows="3" style="resize:none;" name="LinkMeet"></textarea>
+                            </div>
+                        </div>
+
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                            <button type="submit" class="btn btn-primary" id="btnSave">
+                                <i class="fa fa-plus"></i> | <span>Add</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
