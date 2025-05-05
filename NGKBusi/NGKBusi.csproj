@@ -633,7 +633,9 @@
     <Compile Include="Areas\PE\Controllers\NumberingSystemController.cs" />
     <Compile Include="Areas\PE\PEAreaRegistration.cs" />
     <Compile Include="Areas\Purchasing\Controllers\PurchaseRequestController.cs" />
+    <Compile Include="Areas\Purchasing\Controllers\WorkingOrderController.cs" />
     <Compile Include="Areas\Purchasing\Models\PurchaseRequest.cs" />
+    <Compile Include="Areas\Purchasing\Models\WorkingOrder.cs" />
     <Compile Include="Areas\Purchasing\PurchasingAreaRegistration.cs" />
     <Compile Include="Areas\QCC\Controllers\DataController.cs" />
     <Compile Include="Areas\QCC\QCCAreaRegistration.cs" />
@@ -4474,6 +4476,8 @@
     <Content Include="Areas\SCM\Views\WHKD\GeneratePdf.cshtml" />
     <Content Include="Areas\SCM\Views\WHKD\Index.cshtml" />
     <Content Include="Areas\Other\Views\NWR\Index.cshtml" />
+    <Content Include="Areas\Purchasing\Views\_ViewStart.cshtml" />
+    <Content Include="Areas\Purchasing\Views\WorkingOrder\index.cshtml" />
     <None Include="Properties\PublishProfiles\NGKBusi.pubxml" />
     <Content Include="Content\animsition\animsition.css" />
     <Content Include="Content\animsition\animsition.min.css" />
