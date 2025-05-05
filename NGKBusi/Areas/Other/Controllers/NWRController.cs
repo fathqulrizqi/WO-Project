@@ -16,11 +16,11 @@ using NGKBusi.Areas.IT.Controllers;
 
 namespace NGKBusi.Areas.Other.Controllers
 {
-    public class MRRController : Controller
+    public class NWRController : Controller
     {
 
         DefaultConnection db = new DefaultConnection();
-        MRRConnection dbm = new MRRConnection();
+        NWRConnection dbm = new NWRConnection();
 
         public ActionResult Index()
         {
@@ -52,7 +52,7 @@ namespace NGKBusi.Areas.Other.Controllers
             var currUserName = ((ClaimsIdentity)User.Identity).GetUserName();
             var CurrUser = db.V_Users_Active.FirstOrDefault(w => w.NIK == currUser);
 
-            var rooms = dbm.OTH_MRR_Master_Rooms
+            var rooms = dbm.OTH_NWR_Master_Rooms
                 .Where(w => w.IDRoomCat == ID)
                 .Select(room => new
                 {
@@ -61,7 +61,7 @@ namespace NGKBusi.Areas.Other.Controllers
                     room.Image,
                     room.IDRoomCat,
                     room.ExtensionNumber,
-                    prop = dbm.OTH_MRR_Rooms_Properties
+                    prop = dbm.OTH_NWR_Rooms_Properties
                         .Where(p => p.RoomID == room.ID)
                         .Select(prop => new
                         {
@@ -84,7 +84,7 @@ namespace NGKBusi.Areas.Other.Controllers
 
             List<Tbl_Events> scheduleList = new List<Tbl_Events>();
 
-            var bookings = dbm.OTH_MRR_Bookings.Where(b => b.Status == 1 && b.RoomID == roomId).ToList();
+            var bookings = dbm.OTH_NWR_Bookings.Where(b => b.Status == 1 && b.RoomID == roomId).ToList();
 
             foreach (var booking in bookings)
             {
@@ -115,13 +115,13 @@ namespace NGKBusi.Areas.Other.Controllers
 
             List<Tbl_Events> scheduleList = new List<Tbl_Events>();
 
-            var bookings = dbm.OTH_MRR_Bookings.Where(b => b.Status == 1 && b.ID == idBook).ToList();
+            var bookings = dbm.OTH_NWR_Bookings.Where(b => b.Status == 1 && b.ID == idBook).ToList();
 
 
             foreach (var booking in bookings)
             {
                 var color = booking.UserNIK == currUser ? "#DA6F22" : "#007582";
-                var room = dbm.OTH_MRR_Master_Rooms.FirstOrDefault(m => m.ID == booking.RoomID);
+                var room = dbm.OTH_NWR_Master_Rooms.FirstOrDefault(m => m.ID == booking.RoomID);
                 var roomTitle = room != null ? room.RoomTitle : "Unknown Room";
                 var userData = db.V_Users_Active.FirstOrDefault(w => w.NIK == booking.UserNIK);
                 var name = userData != null ? userData.Name : "Unknown Name";
@@ -233,14 +233,14 @@ namespace NGKBusi.Areas.Other.Controllers
             }
 
 
-            var existingBookings = dbm.OTH_MRR_Bookings
+            var existingBookings = dbm.OTH_NWR_Bookings
                 .Where(b => b.RoomID == roomId &&
                             b.Day == day &&
                             //b.ID != idBook &&
                             b.Status == 1)
                 .ToList();
 
-            var conflictingEvents = new List<OTH_MRR_Bookings>();
+            var conflictingEvents = new List<OTH_NWR_Bookings>();
 
             foreach (var booking in existingBookings)
             {
@@ -260,7 +260,7 @@ namespace NGKBusi.Areas.Other.Controllers
                 var conflictMessages = new List<string>();
                 foreach (var conflictingEvent in conflictingEvents)
                 {
-                    var room = dbm.OTH_MRR_Master_Rooms.FirstOrDefault(m => m.ID == conflictingEvent.RoomID);
+                    var room = dbm.OTH_NWR_Master_Rooms.FirstOrDefault(m => m.ID == conflictingEvent.RoomID);
                     var roomTitle = room != null ? room.RoomTitle : "Unknown Room";
                     var userData = db.V_Users_Active.FirstOrDefault(w => w.NIK == conflictingEvent.UserNIK);
                     var name = userData != null ? userData.Name : "Unknown Name";
@@ -295,7 +295,7 @@ namespace NGKBusi.Areas.Other.Controllers
                 }, JsonRequestBehavior.AllowGet);
             }
 
-            var roomR = dbm.OTH_MRR_Master_Rooms.FirstOrDefault(m => m.RoomTitle == title);
+            var roomR = dbm.OTH_NWR_Master_Rooms.FirstOrDefault(m => m.RoomTitle == title);
             var roomId2 = roomR != null ? roomR.ID : 0;
 
             int finalRoomId = (roomId > 0) ? roomId : roomId2;
@@ -303,7 +303,7 @@ namespace NGKBusi.Areas.Other.Controllers
             var user = db.V_Users_Active.FirstOrDefault(u => u.Name == usernik);
             var userNIK = user != null ? user.NIK : null;
 
-            OTH_MRR_Bookings schedule = new OTH_MRR_Bookings
+            OTH_NWR_Bookings schedule = new OTH_NWR_Bookings
             {
                 UserNIK = CurrUser?.NIK ?? usernik,
                 RoomID = finalRoomId,
@@ -318,7 +318,7 @@ namespace NGKBusi.Areas.Other.Controllers
                 Timestamps = DateTime.Now
             };
 
-            dbm.OTH_MRR_Bookings.Add(schedule);
+            dbm.OTH_NWR_Bookings.Add(schedule);
             int ins = dbm.SaveChanges();
 
             if (ins > 0)
@@ -392,7 +392,7 @@ namespace NGKBusi.Areas.Other.Controllers
             }
 
 
-            var schedule = dbm.OTH_MRR_Bookings.First(b => b.ID == idBook);
+            var schedule = dbm.OTH_NWR_Bookings.First(b => b.ID == idBook);
             var user = db.V_Users_Active.FirstOrDefault(u => u.Name == usernik);
             var userNIK = user != null ? user.NIK : null;
 
@@ -408,14 +408,14 @@ namespace NGKBusi.Areas.Other.Controllers
             schedule.Status = 1;
             schedule.Timestamps = DateTime.Now;
 
-            var existingBookings = dbm.OTH_MRR_Bookings
+            var existingBookings = dbm.OTH_NWR_Bookings
                 .Where(b => b.RoomID == roomId &&
                             b.Day == day &&
                             b.ID != idBook &&
                             b.Status == 1)
                 .ToList();
 
-            var conflictingEvents = new List<OTH_MRR_Bookings>();
+            var conflictingEvents = new List<OTH_NWR_Bookings>();
 
             foreach (var booking in existingBookings)
             {
@@ -436,7 +436,7 @@ namespace NGKBusi.Areas.Other.Controllers
                 if (conflictingEvents.Count == 1)
                 {
                     var conflictingEvent = conflictingEvents.First();
-                    var room = dbm.OTH_MRR_Master_Rooms.FirstOrDefault(m => m.ID == conflictingEvent.RoomID);
+                    var room = dbm.OTH_NWR_Master_Rooms.FirstOrDefault(m => m.ID == conflictingEvent.RoomID);
                     var roomTitle = room != null ? room.RoomTitle : "Unknown Room";
                     var userData = db.V_Users_Active.FirstOrDefault(w => w.NIK == conflictingEvent.UserNIK);
                     var name = userData != null ? userData.Name : "Unknown Name";
@@ -470,7 +470,7 @@ namespace NGKBusi.Areas.Other.Controllers
 
                     foreach (var conflictingEvent in conflictingEvents)
                     {
-                        var room = dbm.OTH_MRR_Master_Rooms.FirstOrDefault(m => m.ID == conflictingEvent.RoomID);
+                        var room = dbm.OTH_NWR_Master_Rooms.FirstOrDefault(m => m.ID == conflictingEvent.RoomID);
                         var roomTitle = room != null ? room.RoomTitle : "Unknown Room";
                         var userData = db.V_Users_Active.FirstOrDefault(w => w.NIK == conflictingEvent.UserNIK);
                         var name = userData != null ? userData.Name : "Unknown Name";
@@ -528,7 +528,7 @@ namespace NGKBusi.Areas.Other.Controllers
         }
 
         [HttpPost]
-        public JsonResult SubmitRequest(OTH_MRR_Requests requestModel)
+        public JsonResult SubmitRequest(OTH_NWR_Requests requestModel)
         {
             var currUser = ((ClaimsIdentity)User.Identity).GetUserId();
             var CurrUser = db.V_Users_Active.Where(w => w.NIK == currUser).First();
@@ -552,7 +552,7 @@ namespace NGKBusi.Areas.Other.Controllers
             var messageRequest = Request["messageRequest"];
             var attendanceRequest = Int32.Parse(Request["attendanceRequest"]);
 
-            var existingRequests = dbm.OTH_MRR_Requests
+            var existingRequests = dbm.OTH_NWR_Requests
          .Where(r => r.NIKRequest == NIKRequest && r.idConflict == idConflict && r.statusR == 2)
          .ToList();
 
@@ -585,7 +585,7 @@ namespace NGKBusi.Areas.Other.Controllers
             int status = 0;
             string msg = "";
 
-            OTH_MRR_Requests request = new OTH_MRR_Requests();
+            OTH_NWR_Requests request = new OTH_NWR_Requests();
             request.idConflict = idConflict;
             request.NIKConflict = NIKConflict;
             request.dateConflict = dateConflict;
@@ -603,7 +603,7 @@ namespace NGKBusi.Areas.Other.Controllers
             request.attendanceRequest = attendanceRequest;
             request.timestamps = DateTime.Now;
             request.statusR = 2;
-            dbm.OTH_MRR_Requests.Add(request);
+            dbm.OTH_NWR_Requests.Add(request);
             int ins = dbm.SaveChanges();
 
             if (ins > 0)
@@ -648,19 +648,19 @@ namespace NGKBusi.Areas.Other.Controllers
 
         public void SendEmail(int idRequest)
         {
-            string FilePath = Path.Combine(Server.MapPath("~/Emails/Other/MRR/"), "notif.html");
+            string FilePath = Path.Combine(Server.MapPath("~/Emails/Other/NWR/"), "notif.html");
             StreamReader str = new StreamReader(FilePath);
             string MailText = str.ReadToEnd();
             str.Close();
 
-            var requests = dbm.OTH_MRR_Requests.FirstOrDefault(w => w.id == idRequest);
-            
+            var requests = dbm.OTH_NWR_Requests.FirstOrDefault(w => w.id == idRequest);
+
             var emailConflict = db.Users.FirstOrDefault(w => w.NIK == requests.NIKConflict);
             var emailRequest = db.V_Users_Active.FirstOrDefault(w => w.NIK == requests.NIKRequest);
 
 
-            MailText = MailText.Replace("##RecipientName##", emailConflict?.Name?? "Unknown User");
-            MailText = MailText.Replace("##ExistingUser##", emailConflict?.Email?? "Unknown User");
+            MailText = MailText.Replace("##RecipientName##", emailConflict?.Name ?? "Unknown User");
+            MailText = MailText.Replace("##ExistingUser##", emailConflict?.Email ?? "Unknown User");
             MailText = MailText.Replace("##ExistingDate##", requests.dateConflict);
             MailText = MailText.Replace("##ExistingTimeStart##", requests.startConflict);
             MailText = MailText.Replace("##ExistingTimeEnd##", requests.endConflict);
@@ -679,6 +679,7 @@ namespace NGKBusi.Areas.Other.Controllers
             var senderEmail = new MailAddress("ngkportal-notification@ngkbusi.com", "NWR Request");
             //var receiverEmail = new MailAddress(emailConflict.Email, "Receiver");
             var receiverEmail = new MailAddress("adisti.putri@ngkbusi.com", "Receiver");
+            var ccEmail = new MailAddress("faaay.adistiii@gmail.com", "CC Recipient"); 
             var password = "100%NGKbusi!";
             var sub = "NWR Conflict Request";
             var body = MailText;
@@ -689,9 +690,9 @@ namespace NGKBusi.Areas.Other.Controllers
                 EnableSsl = true,
                 DeliveryMethod = SmtpDeliveryMethod.Network,
                 UseDefaultCredentials = false,
-
                 Credentials = new NetworkCredential(senderEmail.Address, password)
             };
+
             using (var mess = new MailMessage(senderEmail, receiverEmail)
             {
                 Subject = sub,
@@ -699,16 +700,17 @@ namespace NGKBusi.Areas.Other.Controllers
                 IsBodyHtml = true
             })
             {
+                mess.CC.Add(ccEmail); 
                 smtp.Send(mess);
             }
         }
 
-        [HttpPost]
+            [HttpPost]
         public JsonResult GetRequest()
         {
             var currUser = ((ClaimsIdentity)User.Identity).GetUserId();
 
-            var requests = dbm.OTH_MRR_Requests
+            var requests = dbm.OTH_NWR_Requests
                 .Where(r => r.statusR == 2 && r.NIKConflict == currUser)
                 .Select(req => new {
                     req.id,
@@ -738,7 +740,7 @@ namespace NGKBusi.Areas.Other.Controllers
         {
             var currUser = ((ClaimsIdentity)User.Identity).GetUserId();
 
-            var requests = dbm.OTH_MRR_Requests
+            var requests = dbm.OTH_NWR_Requests
                 .Where(r => r.statusR == 2 && r.NIKConflict == currUser && r.id == id)
                 .Select(req => new {
                     req.id,
@@ -766,7 +768,7 @@ namespace NGKBusi.Areas.Other.Controllers
         [HttpPost]
         public JsonResult DeleteSchedule(int idBook)
         {
-            var booking = dbm.OTH_MRR_Bookings.FirstOrDefault(b => b.ID == idBook);
+            var booking = dbm.OTH_NWR_Bookings.FirstOrDefault(b => b.ID == idBook);
 
             var currentTime = DateTime.Now.AddDays(-1);
             if (currentTime > booking.Day)
@@ -780,7 +782,7 @@ namespace NGKBusi.Areas.Other.Controllers
                 return Json(new { success = false, message = "You have no right to delete this schedule."});
             }
 
-            dbm.OTH_MRR_Bookings.Remove(booking);
+            dbm.OTH_NWR_Bookings.Remove(booking);
             dbm.SaveChanges();
 
             return Json(new { success = true, message = "Workspace Deleted Successfully" });
@@ -792,8 +794,8 @@ namespace NGKBusi.Areas.Other.Controllers
         //MailAddress to = new MailAddress("postmaster@eranet.id");
         //MailAddress from = new MailAddress("admin@eranet.id");
         //MailMessage message = new MailMessage(from, to);
-        //message.Subject = "MRR Request";
-        //    message.Body = "MRR Body";
+        //message.Subject = "NWR Request";
+        //    message.Body = "NWR Body";
 
         //    var password = "100%NGKbusi!";
         //var sub = "Portal Reminder";

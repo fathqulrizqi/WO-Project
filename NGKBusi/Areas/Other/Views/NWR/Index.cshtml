@@ -222,7 +222,7 @@
         var roomRequest;
 
     function renderCalendar(roomId) {
-    const link = '@Url.Action("GetSchedule", "MRR", new { area = "Other" })' + '?roomId=' + roomId;
+    const link = '@Url.Action("GetSchedule", "NWR", new { area = "Other" })' + '?roomId=' + roomId;
     var calendarEl = document.getElementById('calendar');
         var calendar = new FullCalendar.Calendar(calendarEl, {
             expandRows: true,
@@ -343,7 +343,7 @@
 
                     $.ajax({
                         type: 'GET',
-                        url: `@Url.Action("GetScheduleByEventId", "MRR", new { area = "Other" })`,
+                        url: `@Url.Action("GetScheduleByEventId", "NWR", new { area = "Other" })`,
                         data: { idBook: idBook },
                         success: function (res) {
                             console.log("exdetail", conflictingEvent);
@@ -424,7 +424,7 @@
 
                                     var posting = $.ajax({
                                         type: 'POST',
-                                        url: "@Url.Action("SubmitRequest", "MRR", new { area = "Other" })",
+                                        url: "@Url.Action("SubmitRequest", "NWR", new { area = "Other" })",
                                         data: submitForm,
                                         cache: false,
                                         contentType: false,
@@ -538,7 +538,7 @@
 
                     $.ajax({
                         type: 'POST',
-                        url: "@Url.Action("AddSchedule", "MRR", new { area = "Other" })",
+                        url: "@Url.Action("AddSchedule", "NWR", new { area = "Other" })",
                         data: formData,
                         cache: false,
                         contentType: false,
@@ -695,7 +695,7 @@
             document.body.appendChild(tooltip);
 
             $.ajax({
-                url: "@Url.Action("GetScheduleByEventId", "MRR", new { area = "Other" })",
+                url: "@Url.Action("GetScheduleByEventId", "NWR", new { area = "Other" })",
                 type: "POST",
                 data: { idBook: id },
                 dataType: "json",
@@ -740,7 +740,7 @@
                 const calendar = info.view.calendar;
 
                 $.ajax({
-                    url: "@Url.Action("GetScheduleByEventId", "MRR", new { area = "Other" })",
+                    url: "@Url.Action("GetScheduleByEventId", "NWR", new { area = "Other" })",
                     type: "POST",
                     data: { idBook: id },
                     dataType: "json",
@@ -815,7 +815,7 @@
                     }).then((result) => {
                         if (result.isConfirmed) {
                             $.ajax({
-                                url: "@Url.Action("DeleteSchedule", "MRR", new { area = "Other" })",
+                                url: "@Url.Action("DeleteSchedule", "NWR", new { area = "Other" })",
                                 type: "POST",
                                 data: { idBook: id },
                                 dataType: "json",
@@ -924,7 +924,7 @@
                     }
 
                     $.ajax({
-                        url: "@Url.Action("UpdateSchedule", "MRR", new { area = "Other" })",
+                        url: "@Url.Action("UpdateSchedule", "NWR", new { area = "Other" })",
                         type: "POST",
                         data: formDataUpdate,
                         tryCount: 0,
@@ -1013,7 +1013,7 @@
 
     $.ajax({
         type: 'GET',
-        url: `@Url.Action("GetScheduleByEventId", "MRR", new { area = "Other" })`,
+        url: `@Url.Action("GetScheduleByEventId", "NWR", new { area = "Other" })`,
         data: { idBook: idBook },
         success: function (res) {
             console.log("exdetail", conflictData);
@@ -1096,7 +1096,7 @@
                     // Mengirim permintaan
                     $.ajax({
                         type: 'POST',
-                        url: "@Url.Action("SubmitRequest", "MRR", new { area = "Other" })",
+                        url: "@Url.Action("SubmitRequest", "NWR", new { area = "Other" })",
                           tryCount: 0,
             tryLimit: 3,
                         data: submitForm,
@@ -1214,7 +1214,7 @@
 
     function getDetailRooms(roomCat) {
     $.ajax({
-        url: "@Url.Action("GetRoomDetails", "MRR", new { area = "Other" })",
+        url: "@Url.Action("GetRoomDetails", "NWR", new { area = "Other" })",
         type: "POST",
         tryCount: 0,
         tryLimit: 3,
@@ -1235,7 +1235,7 @@
                     let activeClass = index === 0 ? "active" : "";
                     carouselInner.append(`
                         <div class="carousel-item ${activeClass}" data-room-id="${room.ID}" data-room-title="${room.RoomTitle}">
-                            <img alt="${room.Image}" src="@Url.Content("~/Files/Other/MRR/Room/${room.Image}")" class="d-block w-100" height="200px" />
+                            <img alt="${room.Image}" src="@Url.Content("~/Files/Other/NWR/Room/${room.Image}")" class="d-block w-100" height="200px" />
 
                         </div>
                     `);
