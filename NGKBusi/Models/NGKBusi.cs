@@ -1668,6 +1668,7 @@ namespace NGKBusi.Models
         public string VENDGROUP { get; set; }
         public string Name { get; set; }
         public string SearchName { get; set; }
+        public bool IsActive { get; set; }
     }
     public class V_AXVendorList
     {

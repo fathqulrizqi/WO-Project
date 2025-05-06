@@ -9,6 +9,7 @@
 @section cssHead {
     <link rel="stylesheet"
           href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css" />
+    <link href="~/Content/bootstrap/css/bootstrap5.3.3/bootstrap.min.css" rel="stylesheet" />
     <link rel="stylesheet"
           href="https://cdn.datatables.net/2.3.0/css/dataTables.bootstrap5.css" />
     <link rel="stylesheet"
@@ -16,10 +17,11 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-x..." crossorigin="anonymous" referrerpolicy="no-referrer" />
     <link href="~/Content/sweetalert2/sweetalert2.min.css" rel="stylesheet" />
     <style>
+       
         .page-content {
             padding-top: 0 !important;
         }
-       
+
         .dt-length {
             display: flex;
             align-items: center;
@@ -176,25 +178,87 @@
             max-height: 400px;
             overflow-y: auto;
         }
+
+        /* Select2 Custom Styling */
+        .select2-container--default .select2-selection--single {
+            padding: 4px 10px 4px 40px;
+            font-size: 14px;
+            color: #111827;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            background-color: #f9fafb;
+            background-image: url("data:image/svg+xml,%3Csvg fill='gray' viewBox='0 0 20 20' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath fill-rule='evenodd' d='M5.23 7.21a.75.75 0 011.06.02L10 11.178l3.71-3.947a.75.75 0 111.08 1.04l-4.24 4.51a.75.75 0 01-1.08 0L5.21 8.27a.75.75 0 01.02-1.06z' clip-rule='evenodd'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: 12px center;
+            background-size: 16px 16px;
+            height: 38px;
+        }
+
+            .select2-container--default .select2-selection--single .select2-selection__rendered {
+                color: #111827;
+                line-height: 28px;
+                padding-left: 0;
+            }
+
+            .select2-container--default .select2-selection--single .select2-selection__arrow {
+                display: none;
+            }
+
+        .select2-dropdown {
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            background-color: #fff;
+        }
+
+        .select2-container--default .select2-search--dropdown .select2-search__field {
+            padding: 8px;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            outline: none;
+        }
+
+        .select2-container--default .select2-results__option--highlighted[aria-selected] {
+            background-color: #007582;
+            color: white;
+        }
+
+        .select2-container--default .select2-results__option {
+            padding: 8px 12px;
+        }
+
+        .select2-container--default .select2-selection--single:focus {
+            border-color: #007582;
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(0, 117, 130, 0.2);
+        }
+
+        /* Adjust the width of the select2 container */
+        .select2-container {
+            width: 100% !important;
+        }
     </style>
 
 }
 
 @section scriptHead {
+    <script src="~/Content/bootstrap/js/bootstrap5.3.3/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
-    <script src="https://code.jquery.com/jquery-3.7.1.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.3/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.datatables.net/2.3.0/js/dataTables.js"></script>
     <script src="https://cdn.datatables.net/2.3.0/js/dataTables.bootstrap5.js"></script>
     <script src="~/Content/sweetalert2/sweetalert2@11.js"></script>
     <script>
         $(document).ready(function () {
+            $(".selVendorList").select2({
+                dropdownParent: $("#createWOModal"),
+                width: "100%",
+            });
             const table = $("#myTable").DataTable({
                 search: {
                     return: true,
                 },
+                order: [],
                 ajax: {
                 url: '@Url.Action("GetDatas", "WorkingOrder", new { area = "Purchasing" })',
                     type: 'GET',
@@ -204,9 +268,15 @@
                 {
                 data: 'Date',
                 title: 'Date',
-                render: function(data) {
+                render: function (data) {
                     if (data && data.indexOf('/Date(') >= 0) {
-                        return new Date(parseInt(data.substr(6))).toLocaleDateString();
+                        var timestamp = parseInt(data.substr(6));
+                        var date = new Date(timestamp);
+                        var day = date.getDate();
+                        var monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+                        var month = monthNames[date.getMonth()];
+                        var year = date.getFullYear();
+                        return day + ' ' + month + ' ' + year;
                     }
                     return data;
                 }
@@ -280,41 +350,85 @@
 
            $('#createWObutton').on('click', function () {
                 if ($("#hfIsLogin").val() == "True") {
-                    loadVendorData();
                     $("#createWOModal").modal("show");
                 } else {
                     Swal.fire("Failed!", "Please login first!");
-                }
-            });
+               }
 
-            function loadVendorData() {
-                $.ajax({
-                    url: '@Url.Action("GetVendorData", "WorkingOrder", new { area = "Purchasing" })',
-                    type: 'GET',
-                    success: function(response) {
-                        const vendorSelect = $('#vendor');
-                        vendorSelect.empty(); 
-                        vendorSelect.append('<option value="" selected disabled>Select a vendor</option>');
+               $('#formWO').on('submit', function(e) {
+                    e.preventDefault();
 
-                        response.datas.forEach(function(vendor) {
-                            vendorSelect.append($('<option>', {
-                                value: vendor.Name,
-                                text: vendor.Name
-                            }));
-                        });
-                    },
-                    error: function(xhr, status, error) {
-                        console.error('Error loading vendor data:', error);
+                    if (!$('#selVendorList').val()) {
                         Swal.fire({
                             icon: 'error',
-                            title: 'Error',
-                            text: 'Failed to load vendor data'
+                            title: 'Validation Error',
+                            text: 'Please select a vendor'
                         });
+                        return;
                     }
+
+                    if (!$('#subject').val().trim()) {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Validation Error',
+                            text: 'Please enter a subject'
+                        });
+                        return;
+                    }
+
+                    var formData = {
+                        Date: $('#Date').val(),
+                        NIK: $('#NIK').attr('name'),
+                        selVendorList: $('#selVendorList').val(),
+                        Subject: $('#subject').val()
+                    };
+
+                    $.ajax({
+                        url: '@Url.Action("CreateData", "WorkingOrder", new { area = "Purchasing" })',
+                        type: 'POST',
+                        data: formData,
+                        success: function(response) {
+                            console.log("Response:", response);
+                            if (response.success) {
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: 'Success',
+                                    text: response.message
+                                }).then((result) => {
+                                    $('#createWOModal').modal('hide');
+                                    $('#myTable').DataTable().ajax.reload();
+                                });
+                            } else {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Error',
+                                    text: response.message
+                                });
+                            }
+                        },
+                        error: function(xhr, status, error) {
+                            console.error("AJAX Error:", error);
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Error',
+                                text: 'An error occurred while creating the Working Order'
+                            });
+                        }
+                    });
                 });
-            }
+            });
+
+            $('#createWOModal').on('hidden.bs.modal', function () {
+                $('#formWO')[0].reset();
+                $("#selVendorList").val('').trigger('change');
+                $('#subject').val('');
+            });
 
         });
+
+
+
+
     </script>
 }
 
@@ -352,11 +466,11 @@
     </div>
 </div>
 
-<div class="modal fade" id="createWOModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+<div class="modal fade" id="createWOModal" aria-labelledby="exampleModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-xl">
         <div class="modal-content">
             <div class="modal-header" style="background-color: #007582;">
-                <h1 class="modal-title fs-5" style="color: white; font-weight:bold;" id="exampleModalLabel">Create Workspace Reservation</h1>
+                <h1 class="modal-title fs-5" style="color: white; font-weight:bold;" id="exampleModalLabel">Create Working Order</h1>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
 
@@ -364,20 +478,19 @@
                 <div class="modal-body">
                     <div class="mb-3">
                         <div class="row mb-3">
-                            <input type="hidden" id="idEvent" name="idBook" value="0" />
                             <div class="col-2">
-                                <label for="NIK" class="form-label">By</label>
+                                <label for="NIK" class="form-label">User</label>
                             </div>
                             <div class="col-10">
-                                <input type="text" class="form-control" id="NIK" value="@ViewBag.currUsr" readonly>
+                                <input type="text" class="form-control" id="NIK" value="@ViewBag.currUsrName" name="@ViewBag.currUsr" readonly>
                             </div>
                         </div>
                         <div class="row mb-3">
                             <div class="col-2">
-                                <label for="date" class="form-label">Date</label>
+                                <label for="Date" class="form-label">Date</label>
                             </div>
                             <div class="col-10">
-                                <input type="text" class="form-control" id="date" name="Day" value="@ViewBag.currDate" readonly>
+                                <input type="text" class="form-control" id="Date" name="Date" value="@ViewBag.currDate" readonly>
                             </div>
                         </div>
 
@@ -387,12 +500,17 @@
                                 <span style="color: red;">*</span>
                             </div>
                             <div class="col-10">
-                                <select class="form-select" id="vendor" required>
-                                    <option value="" selected disabled>Select a vendor</option>
-                                </select>
+                                <div class="position-relative">
+                                    <select style="padding: 4px;" id="selVendorList" class="selVendorList">
+                                        <option value="">-- Select a Vendor --</option>
+                                        @foreach (var data in ViewBag.vendorList)
+                                        {
+                                            <option value="@data.Name">@(data.ACCOUNTNUM +" | "+ data.Name)</option>
+                                        }
+                                    </select>
+                                </div>
                             </div>
                         </div>
-
 
                         <div class="row mb-3">
                             <div class="col-2">
