@@ -17,7 +17,12 @@ namespace NGKBusi.Areas.Purchasing.Controllers
         public ActionResult Index()
         {
             var currUserId = User.Identity.GetUserId();
+            var now = DateTime.Now.Date;
+            string date = now.ToString("dd-MM-yyyy");
+
+
             ViewBag.currUsr = currUserId;
+            ViewBag.currDate = date;
 
             return View();
         }
@@ -37,5 +42,26 @@ namespace NGKBusi.Areas.Purchasing.Controllers
 
             return Json(new { datas = datas }, JsonRequestBehavior.AllowGet);
         }
+
+        public JsonResult GetVendorData()
+        {
+            var vendorData = db.AX_Vendor_List
+                .Select(vd => new
+                {
+                    vd.Name
+                }).ToList();
+
+            return Json(new { datas = vendorData }, JsonRequestBehavior.AllowGet);
+        }
+
+        //public JsonResult CreateData(int ID)
+        //{
+        //    var date = Request["Date"];
+        //    var usernik = Request["NIK"];
+
+
+        //    return Json(new { datas = datas }, JsonRequestBehavior.AllowGet);
+
+        //}
     }
 }

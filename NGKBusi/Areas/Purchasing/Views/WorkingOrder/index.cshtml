@@ -2,6 +2,7 @@
 @{
     ViewBag.Title = "Working Order";
     Layout = "~/Views/Shared/_Layout.cshtml";
+    bool isLogin = (System.Web.HttpContext.Current.User != null) && System.Web.HttpContext.Current.User.Identity.IsAuthenticated;
 
 }
 
@@ -13,11 +14,12 @@
     <link rel="stylesheet"
           href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.3/css/bootstrap.min.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-x..." crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link href="~/Content/sweetalert2/sweetalert2.min.css" rel="stylesheet" />
     <style>
         .page-content {
             padding-top: 0 !important;
         }
-
+       
         .dt-length {
             display: flex;
             align-items: center;
@@ -186,6 +188,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.3/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.datatables.net/2.3.0/js/dataTables.js"></script>
     <script src="https://cdn.datatables.net/2.3.0/js/dataTables.bootstrap5.js"></script>
+    <script src="~/Content/sweetalert2/sweetalert2@11.js"></script>
     <script>
         $(document).ready(function () {
             const table = $("#myTable").DataTable({
@@ -193,14 +196,13 @@
                     return: true,
                 },
                 ajax: {
-            url: '@Url.Action("GetDatas", "WorkingOrder", new { area = "Purchasing" })',
+                url: '@Url.Action("GetDatas", "WorkingOrder", new { area = "Purchasing" })',
                     type: 'GET',
                     dataSrc: 'datas'
-        },
-
+                },
                 columns: [
-            {
-                        data: 'Date',
+                {
+                data: 'Date',
                 title: 'Date',
                 render: function(data) {
                     if (data && data.indexOf('/Date(') >= 0) {
@@ -276,9 +278,41 @@
             });
 
 
-            $('#createWObutton').on('click', function () {
-                $('#createWOModal').modal('show');
+           $('#createWObutton').on('click', function () {
+                if ($("#hfIsLogin").val() == "True") {
+                    loadVendorData();
+                    $("#createWOModal").modal("show");
+                } else {
+                    Swal.fire("Failed!", "Please login first!");
+                }
             });
+
+            function loadVendorData() {
+                $.ajax({
+                    url: '@Url.Action("GetVendorData", "WorkingOrder", new { area = "Purchasing" })',
+                    type: 'GET',
+                    success: function(response) {
+                        const vendorSelect = $('#vendor');
+                        vendorSelect.empty(); 
+                        vendorSelect.append('<option value="" selected disabled>Select a vendor</option>');
+
+                        response.datas.forEach(function(vendor) {
+                            vendorSelect.append($('<option>', {
+                                value: vendor.Name,
+                                text: vendor.Name
+                            }));
+                        });
+                    },
+                    error: function(xhr, status, error) {
+                        console.error('Error loading vendor data:', error);
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: 'Failed to load vendor data'
+                        });
+                    }
+                });
+            }
 
         });
     </script>
@@ -290,6 +324,8 @@
         Working Order
     </h2>
 </div>
+
+<input type="hidden" id="hfIsLogin" value="@(isLogin.ToString())" />
 
 <div class="max-w-full mx-auto bg-white p-6 rounded-xl shadow-lg">
     <button id="createWObutton" class="btn btn-primary" type="button">Create Working Order</button>
@@ -339,35 +375,24 @@
                         <div class="row mb-3">
                             <div class="col-2">
                                 <label for="date" class="form-label">Date</label>
-                                <span style="color: red;">*</span>
                             </div>
                             <div class="col-10">
-                                <input type="text" class="form-control" id="date" name="Day" required>
+                                <input type="text" class="form-control" id="date" name="Day" value="@ViewBag.currDate" readonly>
                             </div>
                         </div>
 
                         <div class="row mb-3">
                             <div class="col-2">
-                                <label for="starttime" class="form-label">Schedule</label>
+                                <label for="vendor" class="form-label">Vendor</label>
                                 <span style="color: red;">*</span>
                             </div>
-                            <div class="col-5">
-                                <input type="text" class="form-control" id="starttime" name="StartTime" required>
-                            </div>
-                            <div class="col-5">
-                                <input type="text" class="form-control" id="endtime" name="EndTime" required>
+                            <div class="col-10">
+                                <select class="form-select" id="vendor" required>
+                                    <option value="" selected disabled>Select a vendor</option>
+                                </select>
                             </div>
                         </div>
 
-                        <div class="row mb-3">
-                            <div class="col-2">
-                                <label for="roomTitle" class="form-label">Workspace</label>
-                            </div>
-                            <div class="col-10">
-                                <input type="text" class="form-control" id="roomTitle" readonly>
-                                <input type="hidden" id="roomIdHidden" name="Roomid" />
-                            </div>
-                        </div>
 
                         <div class="row mb-3">
                             <div class="col-2">
@@ -375,36 +400,7 @@
                                 <span style="color: red;">*</span>
                             </div>
                             <div class="col-10">
-                                <textarea class="form-control" id="subject" rows="3" style="resize:none;" name="Subject" placeholder="Please write your reservation purpose..." required></textarea>
-                            </div>
-                        </div>
-
-                        <div class="row mb-3">
-                            <div class="col-2">
-                                <label class="form-label">Total Attendance</label>
-                                <span style="color: red;">*</span>
-                            </div>
-                            <div class="col-1">
-                                <input type="number" class="form-control" id="attendance" name="Attendance" min="1" required />
-                            </div>
-                        </div>
-
-                        <div class="row mb-3">
-                            <div class="col-2">
-                                <label class="form-label">Google Calendar Url</label>
-                            </div>
-                            <div class="col-10">
-                                <textarea class="form-control" id="link" name="Link" rows="3" style="resize:none;"></textarea>
-
-                            </div>
-                        </div>
-
-                        <div class="row mb-3">
-                            <div class="col-2">
-                                <label for="linkmeet" class="form-label">Google Meet Url</label>
-                            </div>
-                            <div class="col-10">
-                                <textarea class="form-control" id="linkmeet" rows="3" style="resize:none;" name="LinkMeet"></textarea>
+                                <textarea class="form-control" id="subject" rows="3" style="resize:none;" name="Subject" placeholder="Please write your working order purpose..." required></textarea>
                             </div>
                         </div>
 
