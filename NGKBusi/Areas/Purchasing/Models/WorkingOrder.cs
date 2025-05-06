@@ -19,8 +19,10 @@ namespace NGKBusi.Areas.Purchasing.Models
         public DateTime Date { get; set; }
         public string Number { get; set; }
         public string Vendor { get; set; }
+        public string VendorName { get; set; }
         public string Subject { get; set; }
         public string NIK { get; set; }
+        public string NIKName { get; set; }
         public DateTime Timestamps { get; set; }
     }
 

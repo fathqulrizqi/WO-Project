@@ -7,6 +7,8 @@ using NGKBusi.Models;
 using Microsoft.AspNet.Identity;
 using System.Globalization;
 using NGKBusi.Areas.Purchasing.Models;
+using Microsoft.AspNetCore.Mvc;
+using System.Text.RegularExpressions;
 
 namespace NGKBusi.Areas.Purchasing.Controllers
 {
@@ -31,20 +33,48 @@ namespace NGKBusi.Areas.Purchasing.Controllers
             return View();
         }
 
+
+
+        [HttpGet]
         public JsonResult GetDatas()
         {
+            
+
             var datas = dbm.FA_WO
+                .AsEnumerable()
                 .Select(data => new
                 {
                     data.ID,
-                    data.Date,
+                    Date = data.Date.ToString("yyyy-MM-dd"),
                     data.Number,
                     data.Vendor,
+                    data.VendorName,
                     data.Subject,
-                    data.NIK
+                    data.NIK,
+                    data.NIKName,
                 }).ToList();
 
             return Json(new { datas = datas }, JsonRequestBehavior.AllowGet);
+        }
+
+        public JsonResult GetDataById(int id)
+        {
+            var datas = dbm.FA_WO
+                .Where(w => w.ID == id)
+                .AsEnumerable()
+                .Select(data => new
+                {
+                    data.ID,
+                    Date = data.Date.ToString("yyyy-MM-dd"),
+                    data.Number,
+                    data.Vendor,
+                    data.VendorName,
+                    data.Subject,
+                    data.NIK,
+                    data.NIKName,
+                }).FirstOrDefault();
+
+            return Json(new { datas }, JsonRequestBehavior.AllowGet);
         }
 
         public String toRomawi(string month)
@@ -95,6 +125,7 @@ namespace NGKBusi.Areas.Purchasing.Controllers
             return romawi;
         }
 
+        [HttpPost]
         public JsonResult CreateData()
         {
             
@@ -102,13 +133,19 @@ namespace NGKBusi.Areas.Purchasing.Controllers
                 string format = "dd-MM-yyyy";
                 DateTime date;
 
-            if (!DateTime.TryParseExact(dateStr, format, CultureInfo.InvariantCulture, DateTimeStyles.None, out date))
-            {
-                return Json(new { success = false, message = "Invalid date format. Please use 'dd-MM-yyyy'." }, JsonRequestBehavior.AllowGet);
-            }
+                if (!DateTime.TryParseExact(dateStr, format, CultureInfo.InvariantCulture, DateTimeStyles.None, out date))
+                {
+                    return Json(new { success = false, message = "Invalid date format. Please use 'dd-MM-yyyy'." }, JsonRequestBehavior.AllowGet);
+                }
 
                 var userNik = Request["NIK"];
+                var un = db.Users.FirstOrDefault(w => w.NIK == userNik);
+                var username = un != null ? un.Name : "Unknown User";
+
                 var vendor = Request["selVendorList"];
+                var vn = db.AX_Vendor_List.FirstOrDefault(w => w.ACCOUNTNUM == vendor);
+                var vendorname = vn != null ? vn.Name : "Unknown Vendor";
+
                 var subject = Request["Subject"];
 
                 var year = DateTime.Now.ToString("yyyy");
@@ -134,7 +171,6 @@ namespace NGKBusi.Areas.Purchasing.Controllers
                     sequenceNumber = (int.Parse(currentNumber) + 1).ToString("D4");
                 }
 
-                // Construct the new number using the Roman numeral for the month
                 var newNumber = $"{sequenceNumber}/WO/Niterra/{romanMonth}/{year}";
 
                 FA_WO data = new FA_WO
@@ -142,8 +178,10 @@ namespace NGKBusi.Areas.Purchasing.Controllers
                     Date = date,
                     Number = newNumber,
                     Vendor = vendor,
+                    VendorName = vendorname,
                     Subject = subject,
                     NIK = userNik,
+                    NIKName = username,
                     Timestamps = DateTime.Now
                 };
 

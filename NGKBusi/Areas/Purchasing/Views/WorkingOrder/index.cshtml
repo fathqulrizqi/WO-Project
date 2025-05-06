@@ -17,7 +17,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-x..." crossorigin="anonymous" referrerpolicy="no-referrer" />
     <link href="~/Content/sweetalert2/sweetalert2.min.css" rel="stylesheet" />
     <style>
-       
+
         .page-content {
             padding-top: 0 !important;
         }
@@ -247,17 +247,26 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.3/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.datatables.net/2.3.0/js/dataTables.js"></script>
     <script src="https://cdn.datatables.net/2.3.0/js/dataTables.bootstrap5.js"></script>
+
     <script src="~/Content/sweetalert2/sweetalert2@11.js"></script>
+    <script type="text/javascript">
+        if (window.history.replaceState) {
+            window.history.replaceState(null, null, window.location.href);
+        }
+    </script>
     <script>
         $(document).ready(function () {
             $(".selVendorList").select2({
                 dropdownParent: $("#createWOModal"),
                 width: "100%",
             });
+
+
             const table = $("#myTable").DataTable({
                 search: {
                     return: true,
                 },
+                responsive: true,
                 order: [],
                 ajax: {
                 url: '@Url.Action("GetDatas", "WorkingOrder", new { area = "Purchasing" })',
@@ -265,51 +274,45 @@
                     dataSrc: 'datas'
                 },
                 columns: [
-                {
-                data: 'Date',
-                title: 'Date',
-                render: function (data) {
-                    if (data && data.indexOf('/Date(') >= 0) {
-                        var timestamp = parseInt(data.substr(6));
-                        var date = new Date(timestamp);
-                        var day = date.getDate();
-                        var monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-                        var month = monthNames[date.getMonth()];
-                        var year = date.getFullYear();
-                        return day + ' ' + month + ' ' + year;
-                    }
-                    return data;
-                }
-            },
-            { title: 'Number', data: 'Number' },
-            { title: 'Vendor',  data: 'Vendor' },
-            { title: 'Subject', data: 'Subject' },
-            { title: 'User', data: 'NIK' },
-            {
-                data: null,
-                title: 'Action',
-                searchable: false,
-                orderable: false,
-                render: function (data, type, row) {
-                    return `
-                        <button class="btn btn-pdf" data-id="${row.ID}"><i class="fa-solid fa-file-pdf" style="color: #2C3E50;"></i></button>
-                        <button class="btn btn-edit" data-id="${row.ID}"><i class="fa-solid fa-edit" style="color: orange;"></i></button>
-                        <button class="btn btn-delete" data-id="${row.ID}"><i class="fa-solid fa-trash" style="color: #E74C3C;"></i></button>
-                    `;
-                }
-            }
-        ],
+                    {
+                        data: 'Date',
+                        title: 'Date',
+                        render: {
+                            display: function (data, type, row) {
+                                const parts = data.split('-'); // ['2023', '01', '12']
+                                return `${parts[2]}-${parts[1]}-${parts[0]}`;
+                            },
+                            sort: function (data, type, row) {
+                                return data;
+                            }
+                        }
+                    },
+                    { title: 'Number', data: 'Number' },
+                    { title: 'Vendor', data: 'VendorName' },
+                    { title: 'Subject', data: 'Subject' },
+                    { title: 'User', data: 'NIKName' },
+                    {
+                        data: null,
+                        title: 'Action',
+                        searchable: false,
+                        orderable: false,
+                        render: function (data, type, row) {
+                            return `
+                                <button class="btn btn-pdf" data-id="${row.ID}"><i class="fa-solid fa-file-pdf" style="color: #2C3E50;"></i></button>
+                                <button class="btn btn-edit" data-id="${row.ID}"><i class="fa-solid fa-edit" style="color: orange;"></i></button>
+                            `;
+                        }
+                    }],
                 initComplete: function () {
                     this.api()
                         .columns()
                         .every(function () {
                             var column = this;
                             var title = column.header().textContent;
-
                             if (column.index() !== 6) {
                                 $('<input style="width: 100%; padding: 0.5rem 0.75rem; background-color: white; margin-top: 5px; border: 1px #6B7884 solid; border-radius: 5px;" class="dt-search" type="text" placeholder="Search ' + title + '" />')
                                     .appendTo($(column.footer()))
-                                    .on("keyup change clear", function () {
+                                    .off('keyup change clear').on("keyup change clear", function () {
                                         column.search(this.value).draw();
                                     });
                             }
@@ -334,47 +337,61 @@
 
             $('#myTable').on('click', '.btn-edit', function () {
                 const rowId = $(this).data('id');
-                alert('Edit button clicked for row with ID: ' + rowId);
+
+                $.ajax({
+                url: "@Url.Action("GetDataById", "WorkingOrder", new { area = "Purchasing" })",
+                type: "POST",
+                data: { id: rowId },
+                dataType: "json",
+                cache: false,
+                success: function (res) {
+                    if (res && res.datas) {
+                        const data = res.datas;
+                        $("#NIK").val(data.NIKName || ""); 
+                        $("#subject").val(data.Subject || ""); 
+                        const vendorName = data.VendorName || "-- Select a Vendor --";
+                        $('#selVendorList').val(data.VendorName || "").trigger('change'); 
+
+                        $('#select2-selVendorList-container').text(vendorName);
+
+
+                        let rawDate = data.Date; 
+                        if (rawDate) {
+                            const parts = rawDate.split('-'); 
+                            const formatted = `${parts[2]}-${parts[1]}-${parts[0]}`; 
+                            $("#Date").val(formatted);
+                        }
+                        $("#createWOModal").modal("show");
+                    } else {
+                        Swal.fire('Error!', 'No data found for the selected ID.', 'error');
+                    }
+                },
+                error: function () {
+                    Swal.fire('Error!', 'Failed to retrieve schedule data.', 'error');
+                }
             });
 
-            $('#myTable').on('click', '.btn-delete', function () {
-                const rowId = $(this).data('id');
-                alert('Delete button clicked for row with ID: ' + rowId);
-            });
 
+            });
+          
             $('#myTable').on('click', '.btn-pdf', function () {
                 const rowId = $(this).data('id');
                 alert('PDF button clicked for row with ID: ' + rowId);
             });
 
 
-           $('#createWObutton').on('click', function () {
+           $('#createWObutton').off('click').on('click', function () {
                 if ($("#hfIsLogin").val() == "True") {
                     $("#createWOModal").modal("show");
                 } else {
                     Swal.fire("Failed!", "Please login first!");
                }
 
-               $('#formWO').on('submit', function(e) {
+
+           });
+
+             $('#formWO').off('submit').on('submit', function(e) {
                     e.preventDefault();
-
-                    if (!$('#selVendorList').val()) {
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Validation Error',
-                            text: 'Please select a vendor'
-                        });
-                        return;
-                    }
-
-                    if (!$('#subject').val().trim()) {
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Validation Error',
-                            text: 'Please enter a subject'
-                        });
-                        return;
-                    }
 
                     var formData = {
                         Date: $('#Date').val(),
@@ -416,18 +433,15 @@
                         }
                     });
                 });
-            });
 
-            $('#createWOModal').on('hidden.bs.modal', function () {
+            $('#createWOModal').off('hidden.bs.modal').on('hidden.bs.modal', function () {
                 $('#formWO')[0].reset();
                 $("#selVendorList").val('').trigger('change');
                 $('#subject').val('');
             });
 
         });
-
-
-
+        DataTable.type('date', 'className', ' ');
 
     </script>
 }
@@ -496,7 +510,7 @@
 
                         <div class="row mb-3">
                             <div class="col-2">
-                                <label for="vendor" class="form-label">Vendor</label>
+                                <label for="selVendorList" class="form-label">Vendor</label>
                                 <span style="color: red;">*</span>
                             </div>
                             <div class="col-10">
@@ -505,7 +519,9 @@
                                         <option value="">-- Select a Vendor --</option>
                                         @foreach (var data in ViewBag.vendorList)
                                         {
-                                            <option value="@data.Name">@(data.ACCOUNTNUM +" | "+ data.Name)</option>
+                                            <option value="@data.ACCOUNTNUM">
+                                                @(data.ACCOUNTNUM + " | " + data.Name)
+                                            </option>
                                         }
                                     </select>
                                 </div>
