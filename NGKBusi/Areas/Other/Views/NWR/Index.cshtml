@@ -1,5 +1,5 @@
 ﻿﻿﻿@{
-    ViewBag.Title = "Index";
+    ViewBag.Title = "NWR";
     Layout = "~/Views/Shared/_Layout.cshtml";
     bool isLogin = (System.Web.HttpContext.Current.User != null) && System.Web.HttpContext.Current.User.Identity.IsAuthenticated;
 
@@ -39,7 +39,14 @@
             height: 200px;
             object-fit: cover;
         }
+        .carousel-control-next {
+            background-color: rgba(55, 55, 55, 0.5);
+        }
 
+        .carousel-control-prev {
+            background-color: rgba(55, 55, 55, 0.5);
+        }
+          
         .background-purple {
             background-color: #564154;
         }

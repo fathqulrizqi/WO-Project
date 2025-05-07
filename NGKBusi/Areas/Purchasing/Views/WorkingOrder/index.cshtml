@@ -22,36 +22,6 @@
             padding-top: 0 !important;
         }
 
-        .dt-length {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-left: 5px;
-            gap: 0.5rem;
-            font-size: 0.875rem;
-            color: #374151;
-        }
-
-            .dt-length select {
-                padding: 5px 10px 5px 2.5rem;
-                font-size: 0.875rem;
-                color: #111827;
-                border: 1px solid #d1d5db;
-                border-radius: 0.5rem;
-                background-color: #f9fafb;
-                background-image: url("data:image/svg+xml,%3Csvg fill='gray' viewBox='0 0 20 20' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath fill-rule='evenodd' d='M5.23 7.21a.75.75 0 011.06.02L10 11.178l3.71-3.947a.75.75 0 111.08 1.04l-4.24 4.51a.75.75 0 01-1.08 0L5.21 8.27a.75.75 0 01.02-1.06z' clip-rule='evenodd'/%3E%3C/svg%3E");
-                background-repeat: no-repeat;
-                background-position: 0.75rem center;
-                background-size: 1rem 1rem;
-                display: none;
-            }
-
-            .dt-length label {
-                display: flex;
-                justify-content: center;
-                align-content: center;
-            }
-
         div.dataTables_wrapper .dataTables_length,
         div.dataTables_wrapper .dataTables_filter {
             display: flex;
@@ -68,7 +38,7 @@
             width: 100%;
         }
 
-        .dt-search {
+       /* .dt-search {
             display: flex;
             margin: 0;
             max-width: 150px;
@@ -101,7 +71,12 @@
                 .dt-search input[type="search"]::placeholder {
                     color: #6b7280;
                     font-size: 0.875rem;
-                }
+                }*/
+
+        table {
+            width: 100%;
+            table-layout: auto ;
+        }
 
         .myTable-topbar {
             display: flex;
@@ -139,103 +114,18 @@
             margin-bottom: 1rem;
         }
 
-
-        #dt-search-0 label {
-            font-size: 0;
-            position: relative;
-            display: block;
-            margin-bottom: 5px;
-            margin-right: 5px;
+       /* .dt-orderable-asc {
+            width: 100px;
         }
 
-        #dt-search-0 input[type="search"] {
-            display: block;
-            width: 100%;
-            padding: 0.5rem 0.75rem 0.5rem 2.5rem;
-            font-size: 0.875rem;
-            color: #111827;
-            border: 1px solid #d1d5db;
-            border-radius: 0.5rem;
-            background-color: #f9fafb;
-            background-image: url("data:image/svg+xml,%3Csvg fill='gray' viewBox='0 0 20 20' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath fill-rule='evenodd' d='M12.9 14.32a8 8 0 111.414-1.414l5.387 5.387a1 1 0 01-1.414 1.414l-5.387-5.387zM14 8a6 6 0 11-12 0 6 6 0 0112 0z' clip-rule='evenodd'%3E%3C/path%3E%3C/svg%3E");
-            background-repeat: no-repeat;
-            background-position: 0.75rem center;
-            background-size: 1rem 1rem;
-            outline: none;
-        }
-
-            #dt-search-0 input[type="search"]::placeholder {
-                color: #6b7280;
-                font-size: 0.875rem;
+            .dt-orderable-asc th[data-dt-column="0"] {
+                width: 80px
             }
-
-        table {
-            width: 100%;
-            table-layout: fixed;
-        }
-
+*/
         .dataTables_scrollBody {
-            max-height: 400px;
             overflow-y: auto;
         }
 
-        /* Select2 Custom Styling */
-        .select2-container--default .select2-selection--single {
-            padding: 4px 10px 4px 40px;
-            font-size: 14px;
-            color: #111827;
-            border: 1px solid #d1d5db;
-            border-radius: 8px;
-            background-color: #f9fafb;
-            background-image: url("data:image/svg+xml,%3Csvg fill='gray' viewBox='0 0 20 20' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath fill-rule='evenodd' d='M5.23 7.21a.75.75 0 011.06.02L10 11.178l3.71-3.947a.75.75 0 111.08 1.04l-4.24 4.51a.75.75 0 01-1.08 0L5.21 8.27a.75.75 0 01.02-1.06z' clip-rule='evenodd'/%3E%3C/svg%3E");
-            background-repeat: no-repeat;
-            background-position: 12px center;
-            background-size: 16px 16px;
-            height: 38px;
-        }
-
-            .select2-container--default .select2-selection--single .select2-selection__rendered {
-                color: #111827;
-                line-height: 28px;
-                padding-left: 0;
-            }
-
-            .select2-container--default .select2-selection--single .select2-selection__arrow {
-                display: none;
-            }
-
-        .select2-dropdown {
-            border: 1px solid #d1d5db;
-            border-radius: 8px;
-            background-color: #fff;
-        }
-
-        .select2-container--default .select2-search--dropdown .select2-search__field {
-            padding: 8px;
-            border: 1px solid #d1d5db;
-            border-radius: 6px;
-            outline: none;
-        }
-
-        .select2-container--default .select2-results__option--highlighted[aria-selected] {
-            background-color: #007582;
-            color: white;
-        }
-
-        .select2-container--default .select2-results__option {
-            padding: 8px 12px;
-        }
-
-        .select2-container--default .select2-selection--single:focus {
-            border-color: #007582;
-            outline: none;
-            box-shadow: 0 0 0 2px rgba(0, 117, 130, 0.2);
-        }
-
-        /* Adjust the width of the select2 container */
-        .select2-container {
-            width: 100% !important;
-        }
     </style>
 
 }
@@ -267,6 +157,8 @@
                     return: true,
                 },
                 responsive: true,
+                autoWidth: true,
+                fixedHeader: true,
                 order: [],
                 ajax: {
                 url: '@Url.Action("GetDatas", "WorkingOrder", new { area = "Purchasing" })',
@@ -277,6 +169,7 @@
                     {
                         data: 'Date',
                         title: 'Date',
+                        width: '120px',
                         render: {
                             display: function (data, type, row) {
                                 const parts = data.split('-'); // ['2023', '01', '12']
@@ -295,6 +188,7 @@
                         data: null,
                         title: 'Action',
                         searchable: false,
+                        width: '120px',
                         orderable: false,
                         render: function (data, type, row) {
                             return `
@@ -347,33 +241,42 @@
                 success: function (res) {
                     if (res && res.datas) {
                         const data = res.datas;
-                        $("#NIK").val(data.NIKName || ""); 
-                        $("#subject").val(data.Subject || ""); 
+                        $("#NIK").val(data.NIKName || "");
+                        $("#subject").val(data.Subject || "");
                         const vendorName = data.VendorName || "-- Select a Vendor --";
-                        $('#selVendorList').val(data.VendorName || "").trigger('change'); 
-
+                        $('#selVendorList').val(data.VendorName || "").trigger('change');
                         $('#select2-selVendorList-container').text(vendorName);
+                        $('#timestamps').val(data.Timestamps);
+                        $('#number').val(data.Number);
+                        $('#idWO').val(rowId);
 
 
-                        let rawDate = data.Date; 
+                        let rawDate = data.Date;
                         if (rawDate) {
-                            const parts = rawDate.split('-'); 
-                            const formatted = `${parts[2]}-${parts[1]}-${parts[0]}`; 
+                            const parts = rawDate.split('-');
+                            const formatted = `${parts[2]}-${parts[1]}-${parts[0]}`;
                             $("#Date").val(formatted);
                         }
+                        $('#btnSave').hide();
+                        $('#btnEdit').show();
+
+                        $('#exampleModalLabel').text("Edit Working Order");
                         $("#createWOModal").modal("show");
-                    } else {
-                        Swal.fire('Error!', 'No data found for the selected ID.', 'error');
+                        $('#timestampsDiv').show();
+                        $('#numberDiv').show();
+
+                        } else {
+                            Swal.fire('Error!', 'No data found for the selected ID.', 'error');
+                        }
+                    },
+                    error: function () {
+                        Swal.fire('Error!', 'Failed to retrieve schedule data.', 'error');
                     }
-                },
-                error: function () {
-                    Swal.fire('Error!', 'Failed to retrieve schedule data.', 'error');
-                }
             });
 
 
             });
-          
+
             $('#myTable').on('click', '.btn-pdf', function () {
                 const rowId = $(this).data('id');
                 alert('PDF button clicked for row with ID: ' + rowId);
@@ -381,58 +284,109 @@
 
 
            $('#createWObutton').off('click').on('click', function () {
-                if ($("#hfIsLogin").val() == "True") {
+               if ($("#hfIsLogin").val() == "True") {
                     $("#createWOModal").modal("show");
+                    $('#timestampsDiv').hide();
+                    $('#btnEdit').hide();
+                    $('#btnSave').show();
+                    $('#numberDiv').hide();
                 } else {
                     Swal.fire("Failed!", "Please login first!");
                }
-
-
            });
 
-             $('#formWO').off('submit').on('submit', function(e) {
-                    e.preventDefault();
+            $('#btnSave').off('click').on('click', function(e) {
+                e.preventDefault();
 
-                    var formData = {
-                        Date: $('#Date').val(),
-                        NIK: $('#NIK').attr('name'),
-                        selVendorList: $('#selVendorList').val(),
-                        Subject: $('#subject').val()
-                    };
+                var formData = {
+                    Date: $('#Date').val(),
+                    NIK: $('#NIK').attr('name'),
+                    selVendorList: $('#selVendorList').val(),
+                    Subject: $('#subject').val()
+                };
 
-                    $.ajax({
-                        url: '@Url.Action("CreateData", "WorkingOrder", new { area = "Purchasing" })',
-                        type: 'POST',
-                        data: formData,
-                        success: function(response) {
-                            console.log("Response:", response);
-                            if (response.success) {
-                                Swal.fire({
-                                    icon: 'success',
-                                    title: 'Success',
-                                    text: response.message
-                                }).then((result) => {
-                                    $('#createWOModal').modal('hide');
-                                    $('#myTable').DataTable().ajax.reload();
-                                });
-                            } else {
-                                Swal.fire({
-                                    icon: 'error',
-                                    title: 'Error',
-                                    text: response.message
-                                });
-                            }
-                        },
-                        error: function(xhr, status, error) {
-                            console.error("AJAX Error:", error);
+
+                $.ajax({
+                    url: '@Url.Action("CreateData", "WorkingOrder", new { area = "Purchasing" })',
+                    type: 'POST',
+                    data: formData,
+                    success: function(response) {
+                        console.log("Response:", response);
+                        if (response.success) {
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Success',
+                                text: response.message
+                            }).then((result) => {
+                                $('#createWOModal').modal('hide');
+                                $('#myTable').DataTable().ajax.reload();
+                            });
+                        } else {
                             Swal.fire({
                                 icon: 'error',
                                 title: 'Error',
-                                text: 'An error occurred while creating the Working Order'
+                                text: response.message
                             });
                         }
-                    });
+                    },
+                    error: function(xhr, status, error) {
+                        console.error("AJAX Error:", error);
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: 'An error occurred while creating the Working Order'
+                        });
+                    }
                 });
+            });
+
+            $('#btnEdit').off('click').on('click', function(e) {
+                e.preventDefault();
+
+                var formData = {
+                    id: $('#idWO').val(),
+                    Date: $('#Date').val(),
+                    NIK: $('#NIK').attr('name'),
+                    selVendorList: $('#select2-selVendorList-container').text(),
+                    Subject: $('#subject').val(),
+                    Number: $('#number').val(),
+                    Timestamps: $('#timestamps').val()
+                };
+
+
+                $.ajax({
+                    url: '@Url.Action("UpdateData", "WorkingOrder", new { area = "Purchasing" })',
+                    type: 'POST',
+                    data: formData,
+                    success: function(response) {
+                        console.log("Response:", response);
+                        if (response.success) {
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Success',
+                                text: response.message
+                            }).then((result) => {
+                                $('#createWOModal').modal('hide');
+                                $('#myTable').DataTable().ajax.reload();
+                            });
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Error',
+                                text: response.message
+                            });
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        console.error("AJAX Error:", error);
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: 'An error occurred while creating the Working Order'
+                        });
+                    }
+                });
+            });
 
             $('#createWOModal').off('hidden.bs.modal').on('hidden.bs.modal', function () {
                 $('#formWO')[0].reset();
@@ -451,12 +405,12 @@
     <h2 style="font-weight: bold; margin: 0; font-size: 20px">
         Working Order
     </h2>
+    <button id="createWObutton" class="btn btn-primary ml-4" type="button">Create Working Order</button>
 </div>
 
 <input type="hidden" id="hfIsLogin" value="@(isLogin.ToString())" />
 
 <div class="max-w-full mx-auto bg-white p-6 rounded-xl shadow-lg">
-    <button id="createWObutton" class="btn btn-primary" type="button">Create Working Order</button>
     <div class="overflow-x-auto">
         <table id="myTable" class="hover min-w-full text-sm text-left text-gray-500">
             <thead class="text-xs text-gray-700 uppercase bg-gray-50">
@@ -464,7 +418,7 @@
             </thead>
             <thead>
                 <tr>
-                    <th><input style="padding: 4px 6px; font-size: 12px;" type="text" placeholder="Search Date" class="dt-search" /></th>
+                    <th><input style="padding: 4px 6px; font-size: 12px; width: 100px;" type="text" placeholder="Search Date" class="dt-search" /></th>
                     <th><input style="padding: 4px 6px; font-size: 12px;" type="text" placeholder="Search Number" class="dt-search" /></th>
                     <th><input style="padding: 4px 6px; font-size: 12px;" type="text" placeholder="Search Vendor" class="dt-search" /></th>
                     <th><input style="padding: 4px 6px; font-size: 12px;" type="text" placeholder="Search Subject" class="dt-search" /></th>
@@ -508,6 +462,15 @@
                             </div>
                         </div>
 
+                        <div class="row mb-3" id="numberDiv">
+                            <div class="col-2">
+                                <label for="number" class="form-label">Number</label>
+                            </div>
+                            <div class="col-10">
+                                <input type="text" class="form-control" id="number" name="Number" readonly>
+                            </div>
+                        </div>
+
                         <div class="row mb-3">
                             <div class="col-2">
                                 <label for="selVendorList" class="form-label">Vendor</label>
@@ -528,6 +491,9 @@
                             </div>
                         </div>
 
+                        <input type="hidden" class="form-control" id="idWO" name="id" readonly>
+
+
                         <div class="row mb-3">
                             <div class="col-2">
                                 <label for="subject" class="form-label">Subject</label>
@@ -538,10 +504,22 @@
                             </div>
                         </div>
 
+                        <div class="row mb-3" id="timestampsDiv">
+                            <div class="col-2">
+                                <label for="timestamps" class="form-label">Created Time</label>
+                            </div>
+                            <div class="col-10">
+                                <input type="text" class="form-control" id="timestamps" name="Timestamps" readonly>
+                            </div>
+                        </div>
+
                         <div class="modal-footer">
                             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                             <button type="submit" class="btn btn-primary" id="btnSave">
                                 <i class="fa fa-plus"></i> | <span>Add</span>
+                            </button>
+                            <button type="submit" class="btn btn-primary" id="btnEdit">
+                                <i class="fa fa-edit"></i> | <span>Edit</span>
                             </button>
                         </div>
                     </div>

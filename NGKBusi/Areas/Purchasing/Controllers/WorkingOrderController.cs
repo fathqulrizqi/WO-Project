@@ -9,6 +9,8 @@ using System.Globalization;
 using NGKBusi.Areas.Purchasing.Models;
 using Microsoft.AspNetCore.Mvc;
 using System.Text.RegularExpressions;
+using DocumentFormat.OpenXml.Drawing.Spreadsheet;
+using System.Windows.Interop;
 
 namespace NGKBusi.Areas.Purchasing.Controllers
 {
@@ -72,10 +74,13 @@ namespace NGKBusi.Areas.Purchasing.Controllers
                     data.Subject,
                     data.NIK,
                     data.NIKName,
+                    Timestamps = data.Timestamps.ToString("yyyy-MM-dd HH:mm:ss"),
                 }).FirstOrDefault();
 
             return Json(new { datas }, JsonRequestBehavior.AllowGet);
         }
+
+        
 
         public String toRomawi(string month)
         {
@@ -190,6 +195,52 @@ namespace NGKBusi.Areas.Purchasing.Controllers
 
                 return Json(new { success = true, message = "Working Order created successfully" }, JsonRequestBehavior.AllowGet);
            
+        }
+
+
+        [HttpPost]
+        public JsonResult UpdateData(int id)
+        {
+            var dateStr = Request["Date"];
+
+            var userNik = Request["NIK"];
+            var un = db.Users.FirstOrDefault(w => w.NIK == userNik);
+            var username = un != null ? un.Name : "Unknown User";
+
+            var vendorname = Request["selVendorList"];
+            var vn = db.AX_Vendor_List.FirstOrDefault(w => w.Name == vendorname);
+            var vendor = vn != null ? vn.ACCOUNTNUM : "Unknown Vendor";
+
+            var subject = Request["Subject"];
+            var number = Request["Number"];
+            var timestamps = Request["Timestamps"];
+
+            DateTime date;
+            if (!DateTime.TryParseExact(dateStr, "dd-MM-yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None, out date))
+            {
+                return Json(new { success = false, message = "Invalid date format. Please use 'dd-MM-yyyy'." }, JsonRequestBehavior.AllowGet);
+            }
+            var data = dbm.FA_WO.First(w => w.ID == id);
+
+            data.ID = id;
+            data.Date = date;
+            data.Vendor = vendor;
+            data.VendorName = vendorname;
+            data.Subject = subject;
+            data.NIK = userNik;
+            data.NIKName = username;
+            data.Timestamps = DateTime.Now;
+
+
+            int updateWO = dbm.SaveChanges();
+
+            if (updateWO > 0)
+            {
+                return Json(new { success = true, message = "Working Order Updated Successfully" }, JsonRequestBehavior.AllowGet);
+            } else
+            {
+                return Json(new { success = false, message = "Failed Update Working Order" }, JsonRequestBehavior.AllowGet);
+            }
         }
 
     }
