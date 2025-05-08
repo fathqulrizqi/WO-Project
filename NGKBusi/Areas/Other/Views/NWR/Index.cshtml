@@ -1239,7 +1239,7 @@
                         </div>
                     `);
                 });
-
+                $('.carousel-control-prev, .carousel-control-next').toggle(response.length > 1);
 
                 $("#buildingName").text(response[0]?.RoomTitle || "No Room Available");
                 $("#activeBuildingName").text(response[0]?.RoomTitle || "No Room Available");

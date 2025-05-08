@@ -12,7 +12,7 @@ namespace NGKBusi.Areas.Purchasing.Models
     {
     }
 
-    public class FA_WO
+    public class Purchasing_WorkingOrder_List
     {
         [Key]
         public int ID { get; set; }
@@ -28,7 +28,7 @@ namespace NGKBusi.Areas.Purchasing.Models
 
     public class WOConnection : DbContext
     {
-        public DbSet<FA_WO> FA_WO { get; set; }
+        public DbSet<Purchasing_WorkingOrder_List> Purchasing_WorkingOrder_List { get; set; }
         public WOConnection()
         {
             this.Database.Connection.ConnectionString = System.Configuration.ConfigurationManager.ConnectionStrings["DefaultConnection"].ConnectionString;

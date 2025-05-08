@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Mvc;
 using System.Text.RegularExpressions;
 using DocumentFormat.OpenXml.Drawing.Spreadsheet;
 using System.Windows.Interop;
+using static System.Data.Entity.Infrastructure.Design.Executor;
 
 namespace NGKBusi.Areas.Purchasing.Controllers
 {
@@ -40,9 +41,7 @@ namespace NGKBusi.Areas.Purchasing.Controllers
         [HttpGet]
         public JsonResult GetDatas()
         {
-            
-
-            var datas = dbm.FA_WO
+            var datas = dbm.Purchasing_WorkingOrder_List
                 .AsEnumerable()
                 .Select(data => new
                 {
@@ -61,7 +60,8 @@ namespace NGKBusi.Areas.Purchasing.Controllers
 
         public JsonResult GetDataById(int id)
         {
-            var datas = dbm.FA_WO
+
+            var datas = dbm.Purchasing_WorkingOrder_List
                 .Where(w => w.ID == id)
                 .AsEnumerable()
                 .Select(data => new
@@ -80,7 +80,7 @@ namespace NGKBusi.Areas.Purchasing.Controllers
             return Json(new { datas }, JsonRequestBehavior.AllowGet);
         }
 
-        
+
 
         public String toRomawi(string month)
         {
@@ -133,68 +133,75 @@ namespace NGKBusi.Areas.Purchasing.Controllers
         [HttpPost]
         public JsonResult CreateData()
         {
-            
-                var dateStr = Request["Date"];
-                string format = "dd-MM-yyyy";
-                DateTime date;
 
-                if (!DateTime.TryParseExact(dateStr, format, CultureInfo.InvariantCulture, DateTimeStyles.None, out date))
-                {
-                    return Json(new { success = false, message = "Invalid date format. Please use 'dd-MM-yyyy'." }, JsonRequestBehavior.AllowGet);
-                }
+            var dateStr = Request["Date"];
+            string format = "dd-MM-yyyy";
+            DateTime date;
 
-                var userNik = Request["NIK"];
-                var un = db.Users.FirstOrDefault(w => w.NIK == userNik);
-                var username = un != null ? un.Name : "Unknown User";
+            if (!DateTime.TryParseExact(dateStr, format, CultureInfo.InvariantCulture, DateTimeStyles.None, out date))
+            {
+                return Json(new { success = false, message = "Invalid date format. Please use 'dd-MM-yyyy'." }, JsonRequestBehavior.AllowGet);
+            }
 
-                var vendor = Request["selVendorList"];
-                var vn = db.AX_Vendor_List.FirstOrDefault(w => w.ACCOUNTNUM == vendor);
-                var vendorname = vn != null ? vn.Name : "Unknown Vendor";
+            var userNik = Request["NIK"];
+            var un = db.Users.FirstOrDefault(w => w.NIK == userNik);
+            var username = un != null ? un.Name : "Unknown User";
 
-                var subject = Request["Subject"];
+            var vendor = Request["selVendorList"];
+            var vn = db.AX_Vendor_List.FirstOrDefault(w => w.ACCOUNTNUM == vendor);
+            var vendorname = vn != null ? vn.Name : "Unknown Vendor";
 
-                var year = DateTime.Now.ToString("yyyy");
+            var subject = Request["Subject"];
 
-                string month = date.ToString("MM");
+            var year = DateTime.Now.ToString("yyyy");
 
-                string romanMonth = toRomawi(month);
+            string month = date.ToString("MM");
 
-                var lastNumber = dbm.FA_WO
-                    .Where(w => w.Number.EndsWith(year) && w.Number.Contains("/Niterra/"))
-                    .OrderByDescending(o => o.Number)
-                    .Select(s => s.Number)
-                    .FirstOrDefault();
+            string romanMonth = toRomawi(month);
 
-                string sequenceNumber;
-                if (string.IsNullOrEmpty(lastNumber))
-                {
-                    sequenceNumber = "0001";
-                }
-                else
-                {
-                    var currentNumber = lastNumber.Split('/')[0];
-                    sequenceNumber = (int.Parse(currentNumber) + 1).ToString("D4");
-                }
+            var lastNumber = dbm.Purchasing_WorkingOrder_List
+                .Where(w => w.Number.EndsWith(year) && w.Number.Contains("/Niterra/"))
+                .OrderByDescending(o => o.Number)
+                .Select(s => s.Number)
+                .FirstOrDefault();
 
-                var newNumber = $"{sequenceNumber}/WO/Niterra/{romanMonth}/{year}";
+            string sequenceNumber;
+            if (string.IsNullOrEmpty(lastNumber))
+            {
+                sequenceNumber = "0001";
+            }
+            else
+            {
+                var currentNumber = lastNumber.Split('/')[0];
+                sequenceNumber = (int.Parse(currentNumber) + 1).ToString("D4");
+            }
 
-                FA_WO data = new FA_WO
-                {
-                    Date = date,
-                    Number = newNumber,
-                    Vendor = vendor,
-                    VendorName = vendorname,
-                    Subject = subject,
-                    NIK = userNik,
-                    NIKName = username,
-                    Timestamps = DateTime.Now
-                };
+            var newNumber = $"{sequenceNumber}/WO/Niterra/{romanMonth}/{year}";
 
-                dbm.FA_WO.Add(data);
-                dbm.SaveChanges();
+            Purchasing_WorkingOrder_List data = new Purchasing_WorkingOrder_List
+            {
+                Date = date,
+                Number = newNumber,
+                Vendor = vendor,
+                VendorName = vendorname,
+                Subject = subject,
+                NIK = userNik,
+                NIKName = username,
+                Timestamps = DateTime.Now
+            };
 
-                return Json(new { success = true, message = "Working Order created successfully" }, JsonRequestBehavior.AllowGet);
-           
+            dbm.Purchasing_WorkingOrder_List.Add(data);
+            int addWO = dbm.SaveChanges();
+
+            if (addWO > 0)
+            {
+                return Json(new { success = true, message = "Working Order Added Successfully" }, JsonRequestBehavior.AllowGet);
+            }
+            else
+            {
+                return Json(new { success = false, message = "Failed to Add Working Order" }, JsonRequestBehavior.AllowGet);
+            }
+
         }
 
 
@@ -207,9 +214,9 @@ namespace NGKBusi.Areas.Purchasing.Controllers
             var un = db.Users.FirstOrDefault(w => w.NIK == userNik);
             var username = un != null ? un.Name : "Unknown User";
 
-            var vendorname = Request["selVendorList"];
-            var vn = db.AX_Vendor_List.FirstOrDefault(w => w.Name == vendorname);
-            var vendor = vn != null ? vn.ACCOUNTNUM : "Unknown Vendor";
+            var vendor = Request["selVendorList"];
+            var vn = db.AX_Vendor_List.FirstOrDefault(w => w.ACCOUNTNUM == vendor);
+            var vendorname = vn != null ? vn.Name : "Unknown Vendor";
 
             var subject = Request["Subject"];
             var number = Request["Number"];
@@ -220,8 +227,9 @@ namespace NGKBusi.Areas.Purchasing.Controllers
             {
                 return Json(new { success = false, message = "Invalid date format. Please use 'dd-MM-yyyy'." }, JsonRequestBehavior.AllowGet);
             }
-            var data = dbm.FA_WO.First(w => w.ID == id);
+            var data = dbm.Purchasing_WorkingOrder_List.First(w => w.ID == id);
 
+            data.Timestamps = DateTime.Now;
             data.ID = id;
             data.Date = date;
             data.Vendor = vendor;
@@ -229,7 +237,6 @@ namespace NGKBusi.Areas.Purchasing.Controllers
             data.Subject = subject;
             data.NIK = userNik;
             data.NIKName = username;
-            data.Timestamps = DateTime.Now;
 
 
             int updateWO = dbm.SaveChanges();
@@ -237,10 +244,17 @@ namespace NGKBusi.Areas.Purchasing.Controllers
             if (updateWO > 0)
             {
                 return Json(new { success = true, message = "Working Order Updated Successfully" }, JsonRequestBehavior.AllowGet);
-            } else
+            }
+            else
             {
                 return Json(new { success = false, message = "Failed Update Working Order" }, JsonRequestBehavior.AllowGet);
             }
+        }
+
+        public ActionResult Detail(int id)
+        {
+
+            return View();
         }
 
     }

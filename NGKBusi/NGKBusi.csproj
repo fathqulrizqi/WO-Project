@@ -4478,6 +4478,7 @@
     <Content Include="Areas\Other\Views\NWR\Index.cshtml" />
     <Content Include="Areas\Purchasing\Views\_ViewStart.cshtml" />
     <Content Include="Areas\Purchasing\Views\WorkingOrder\index.cshtml" />
+    <Content Include="Areas\Purchasing\Views\WorkingOrder\detail.cshtml" />
     <None Include="Properties\PublishProfiles\NGKBusi.pubxml" />
     <Content Include="Content\animsition\animsition.css" />
     <Content Include="Content\animsition\animsition.min.css" />
@@ -7451,7 +7452,7 @@
           <AutoAssignPort>True</AutoAssignPort>
           <DevelopmentServerPort>50786</DevelopmentServerPort>
           <DevelopmentServerVPath>/</DevelopmentServerVPath>
-          <IISUrl>http://localhost/NGKBusi</IISUrl>
+          <IISUrl>http://localhost:1075/NGKBusi</IISUrl>
           <NTLMAuthentication>False</NTLMAuthentication>
           <UseCustomServer>False</UseCustomServer>
           <CustomServerUrl>

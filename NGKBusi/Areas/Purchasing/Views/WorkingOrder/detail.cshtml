@@ -1,0 +1,51 @@
+﻿
+@{
+    ViewBag.Title = "Detail Working Order";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+}
+
+@section cssHead {
+    <style>
+        .page-content {
+            padding-top: 0 !important;
+        }
+    </style>
+}
+
+@section scriptHead {
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="~/Scripts/tinymce/tinymce.min.js"></script>
+
+    <script>
+        tinymce.init({
+            selector: 'textarea#exportpdf',
+            height: '800px',
+            plugins: [
+                "advlist", "anchor", "autolink", "charmap", "code", "codesample", "fullscreen",
+                "help", "image", "insertdatetime", "link", "lists", "media",
+                "preview", "searchreplace", "table", "visualblocks",
+            ],
+            toolbar: "undo redo | styles | bold italic underline strikethrough | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image",
+            image_caption: true,
+        });
+    </script>
+
+    <script>
+
+    </script>
+
+}
+
+<div class="d-flex align-items-center rounded" style="color: #2C3E50;">
+    <span style="color: #F6AA04; font-weight: bold; font-size: 20px; margin: 20px;">|</span>
+    <h2 style="font-weight: bold; margin: 0; font-size: 20px">
+        Detail Working Order
+    </h2>
+</div>
+
+<div class="max-w-full mx-auto bg-white p-6 rounded-xl shadow-lg">
+    <textarea id="exportpdf">hiii</textarea>
+</div>
+
+
