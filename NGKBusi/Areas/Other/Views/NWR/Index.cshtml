@@ -30,6 +30,11 @@
             margin: 40px auto;
         }
 
+        .fc-col-header {
+            background-color: #2C3E50;
+            color: white;
+        }
+
         .building-info {
             margin-top: 20px;
         }
@@ -39,14 +44,7 @@
             height: 200px;
             object-fit: cover;
         }
-        .carousel-control-next {
-            background-color: rgba(55, 55, 55, 0.5);
-        }
 
-        .carousel-control-prev {
-            background-color: rgba(55, 55, 55, 0.5);
-        }
-          
         .background-purple {
             background-color: #564154;
         }
@@ -201,6 +199,27 @@
             white-space: nowrap;
             width: 1px;
         }
+        /* .carousel-control-prev-icon, .carousel-control-next-icon {
+            width: 50px;
+            height: 50px;
+            color: white;
+        }*/
+
+        .carousel-control-prev-icon {
+            background-image: url("data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='%23fff' viewBox='0 0 8 8'%3E%3Cpath d='M5.25 0l-4 4 4 4 1.5-1.5-2.5-2.5 2.5-2.5-1.5-1.5z'/%3E%3C/svg%3E") !important;
+        }
+
+        .carousel-control-next-icon {
+            background-image: url("data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='%23fff' viewBox='0 0 8 8'%3E%3Cpath d='M2.75 0l-1.5 1.5 2.5 2.5-2.5 2.5 1.5 1.5 4-4-4-4z'/%3E%3C/svg%3E") !important;
+        }
+
+        .carousel-control-next {
+            background-color: rgba(55, 55, 55, 0.5);
+        }
+
+        .carousel-control-prev {
+            background-color: rgba(55, 55, 55, 0.5);
+        }
     </style>
 }
 
@@ -210,7 +229,11 @@
     <script src="~/Content/bootstrap/js/bootstrap5.3.3/bootstrap.bundle.min.js"></script>
     <script src="~/Scripts/moment2.29.1/moment.min.js"></script>
     <script src="~/Content/bootstrap/js/bootstrap5.3.2/bootstrap.bundle.min.js"></script>
-
+    <script type="text/javascript">
+        if (window.history.replaceState) {
+            window.history.replaceState(null, null, window.location.href);
+        }
+    </script>
     <script>
         var idConflictX;
         var startConflictX;
@@ -325,7 +348,8 @@
                             confirmButtonColor: '#007bff',
                         }).then((result) => {
                             if (result.isConfirmed) {
-                                populateRequestModal(event);
+                                //populateRequestModal(event);
+                                populateRequestModal(event, info.start, info.end);
                                 $("#createModal").modal('hide');
                                 // $('#requestModal').modal('show');
                             }
@@ -336,42 +360,49 @@
                 }
 
 
-                function populateRequestModal(conflictingEvent) {
+                function populateRequestModal(conflictingEvent, startTime, endTime) {
                     const idBook = conflictingEvent.id || conflictingEvent.ID;
                     const activeRoomTitle = $("#buildingName").text();
+
+                    // Store the selected times for later use
+                    const selectedStart = startTime || $("#starttime").val();
+                    const selectedEnd = endTime || $("#endtime").val();
+                    const selectedDate = $("#date").val();
 
                     $.ajax({
                         type: 'GET',
                         url: `@Url.Action("GetScheduleByEventId", "NWR", new { area = "Other" })`,
                         data: { idBook: idBook },
                         success: function (res) {
-                            console.log("exdetail", conflictingEvent);
                             if (res && res.length > 0) {
                                 const eventDetails = res[0];
-                                const strstart = info.startStr;
-                                const strend = info.endStr;
-                                const arrstart = strstart.trim().split(/\T|\+/);
-                                const arrend = strend.trim().split(/\T|\+/);
-                                const idBook = conflictingEvent.id || conflictingEvent.ID;
-                                const activeRoomTitle = $("#buildingName").text();
-                                //const originalDate = conflictingEvent.Day.split("T")[0];
-                                //const parts = originalDate.split("-");
-                                //const formattedDate = `${parts[2]}-${parts[1]}-${parts[0]}`;
 
+                                // Populate conflict details
                                 $("#usernameConflict").val(eventDetails.username);
                                 $("#subjectConflict").val(conflictingEvent.Subject || conflictingEvent.title);
-                                //$("#dateConflict").val(formattedDate || moment(conflictingEvent.start).format('DD-MM-YYYY'));
                                 $("#dateConflict").val(conflictingEvent.Day || moment(conflictingEvent.start).format('DD-MM-YYYY'));
                                 $("#starttimeConflict").val(conflictingEvent.StartTime || moment(conflictingEvent.start).format('HH:mm'));
                                 $("#endtimeConflict").val(conflictingEvent.EndTime || moment(conflictingEvent.end).format('HH:mm'));
                                 $("#roomTitleConflict").val(activeRoomTitle);
                                 $("#attendanceConflict").val(eventDetails.attendance);
+
+                                // Populate request details
                                 $("#usernameRequest").val();
                                 $("#roomTitleRequest").val(activeRoomTitle);
-                                //$("#dateRequest").val(formattedDate || moment(conflictingEvent.start).format('DD-MM-YYYY'));
-                                $("#dateRequest").val(conflictingEvent.Day || moment(conflictingEvent.start).format('DD-MM-YYYY'));
-                                $("#starttimeRequest").val(arrstart[1].slice(0, 5));
-                                $("#endtimeRequest").val(arrend[1].slice(0, 5));
+
+                                // Use the stored selected times if available
+                                if (startTime && endTime) {
+                                    // Direct selection from calendar
+                                    $("#dateRequest").val(moment(startTime).format('DD-MM-YYYY'));
+                                    $("#starttimeRequest").val(moment(startTime).format('HH:mm'));
+                                    $("#endtimeRequest").val(moment(endTime).format('HH:mm'));
+                                } else {
+                                    // From create modal submission
+                                    $("#dateRequest").val(selectedDate);
+                                    $("#starttimeRequest").val(selectedStart);
+                                    $("#endtimeRequest").val(selectedEnd);
+                                }
+
 
                                 $('#requestModal').modal('show');
 
@@ -398,14 +429,32 @@
                                      var startcon = $("#starttimeConflict").val();
                                      var endcon = $("#endtimeConflict").val();
 
-                                     if (startreq < endcon && endreq > startcon) {
-                                     } else {
+                                     if (!(startreq < endcon && endreq > startcon)) {
+
                                          Swal.fire({
                                              icon: 'warning',
-                                             title: 'Invalid Request Time',
-                                             text: 'The requested time is not in conflict with the existing reservation.',
-                                             confirmButtonText: 'Dismiss'
-                                         })
+                                             title: 'Conflict Not Found!',
+                                             text: 'Would you like to create a new booking instead?',
+                                             showCancelButton: true,
+                                             confirmButtonText: 'Create New',
+                                             cancelButtonText: 'Cancel'
+                                         }).then((result) => {
+                                             if (result.isConfirmed) {
+                                                 // Create new booking
+                                                 $("#requestModal").modal('hide');
+
+                                                 // Populate create modal with the request form values
+                                                 $("#date").val($("#dateRequest").val());
+                                                 $("#starttime").val(startreq);
+                                                 $("#endtime").val(endreq);
+                                                 $("#roomTitle").val($("#roomTitleRequest").val());
+                                                 $("#username").val($("#usernameRequest").val());
+
+                                                 $("#attendance").val($("#attendanceRequest").val());
+
+                                                 $("#createModal").modal('show');
+                                             }
+                                         });
                                          return;
                                      }
 
@@ -460,14 +509,7 @@
                                     }).always(function () {
                                         $submitButton.prop("disabled", false).text("Submit Request");
                                     });
-                                    });
-
-                            } else {
-                                Swal.fire({
-                                    icon: 'warning',
-                                    title: 'No Data Found',
-                                    text: 'Could not retrieve event details. Please try again later.'
-                                });
+                                 });
                             }
                         },
                         error: function (xhr, status, error) {
@@ -600,24 +642,24 @@
                                         confirmButtonColor: '#007bff',
                                     }).then((result) => {
                                         if (result.isConfirmed) {
-                                        $("#createModal").modal('hide');
-                                        const conflictingEvent = data.conflict;
+                                            $("#createModal").modal('hide');
+                                            const conflictingEvent = data.conflict;
 
-                                        if (conflictingEvent && conflictingEvent.length > 0) {
-                                            const event = conflictingEvent[0];
-                                            console.log('event', event);
-                                            populateRequestModal(event);
-                                        } else {
-                                            console.error("conflictingEvent is undefined or empty:", conflictingEvent);
-                                            Swal.fire({
-                                                icon: 'error',
-                                                title: 'Missing Data',
-                                                text: 'Conflict data not found. Please try again later.'
-                                            });
+                                            if (conflictingEvent && conflictingEvent.length > 0) {
+                                                const event = conflictingEvent[0];
+                                                populateRequestModal(event, null, null);
+                                            } else {
+                                                Swal.fire({
+                                                    icon: 'error',
+                                                    title: 'Missing Data',
+                                                    text: 'Conflict data not found. Please try again later.'
+                                                });
+                                            }
                                         }
-                                    }
                                     });
                                     return;
+
+
                                 } else {
                                     Swal.fire({
                                         icon: 'error',
@@ -1015,7 +1057,6 @@
         url: `@Url.Action("GetScheduleByEventId", "NWR", new { area = "Other" })`,
         data: { idBook: idBook },
         success: function (res) {
-            console.log("exdetail", conflictData);
             if (res && res.length > 0) {
                 const eventDetails = res[0];
 
@@ -1048,95 +1089,119 @@
 
                 // Menangani pengiriman formulir permintaan
                 $("#formRequest").off("submit").on("submit", function (event) {
-                    event.preventDefault();
+    event.preventDefault();
 
-                    if (!$("#formRequest").valid()) {
-                        return;
-                    }
+    if (!$("#formRequest").valid()) {
+        return;
+    }
 
-                    const form = this;
-                    if (!form.checkValidity()) {
-                        form.classList.add('was-validated');
-                        return;
-                    }
+    const form = this;
+    if (!form.checkValidity()) {
+        form.classList.add('was-validated');
+        return;
+    }
 
-                    var startreq = $("#starttimeRequest").val();
-                    var endreq = $("#endtimeRequest").val();
-                    var startcon = $("#starttimeConflict").val();
-                    var endcon = $("#endtimeConflict").val();
+    var startreq = $("#starttimeRequest").val();
+    var endreq = $("#endtimeRequest").val();
+    var startcon = $("#starttimeConflict").val();
+    var endcon = $("#endtimeConflict").val();
 
-                    // Validasi waktu permintaan
-                    if (startreq < endcon && endreq > startcon) {
-                        // Lanjutkan jika waktu permintaan valid
-                    } else {
-                        Swal.fire({
-                            icon: 'warning',
-                            title: 'Invalid Request Time',
-                            text: 'The requested time is not in conflict with the existing reservation.',
-                            confirmButtonText: 'Dismiss'
-                        });
-                        return;
-                    }
+    // Check if we have an ID (coming from update)
+    const hasId = $("#idEvent").val() !== "" && $("#idEvent").val() !== undefined;
 
-                    var $submitButton = $(this).find("button[type='submit']");
-                    $submitButton.prop("disabled", true).text("Submitting...");
-
-                    var submitForm = new FormData(form);
-                    var usernikr = $("#userIdRequest").val();
-                    console.log("data", submitForm);
-
-                    // Menambahkan data tambahan ke submitForm
-                    submitForm.append("idConflict", eventDetails.id);
-                    submitForm.append("NIKConflict", eventDetails.user);
-                    submitForm.append("startConflict", eventDetails.start);
-                    submitForm.append("endConflict", eventDetails.end);
-                    submitForm.append("NIKRequest", usernikr);
-
-                    // Mengirim permintaan
+    // Validasi waktu permintaan
+    if (!(startreq < endcon && endreq > startcon)) {
+        if (hasId) {
+            // If we have an ID, show update-only option
+            Swal.fire({
+                icon: 'warning',
+                title: 'Conflict Not Found!',
+                text: 'Would you like to update the existing booking instead?',
+                showCancelButton: true,
+                confirmButtonText: 'Update Existing',
+                cancelButtonText: 'Cancel',
+                confirmButtonColor: '#007bff',
+            }).then((result) => {
+                if (result.isConfirmed, info) {
+                    const id = info.event.id;
                     $.ajax({
-                        type: 'POST',
-                        url: "@Url.Action("SubmitRequest", "NWR", new { area = "Other" })",
-                          tryCount: 0,
-            tryLimit: 3,
-                        data: submitForm,
-                        cache: false,
-                        contentType: false,
-                        processData: false,
-                    }).done(function (result) {
-                        if (result.status === 1) {
-                            Swal.fire({
-                                icon: 'success',
-                                title: 'Success!',
-                                text: result.message,
-                                confirmButtonText: 'OK'
-                            }).then((result) => {
-                                $('#requestModal').modal('hide');
-
-                                if (calendar) {
-                                    calendar.gotoDate(conflictData.start);
-                                    calendar.refetchEvents();
-                                }
-                            });
-                        } else {
-                            Swal.fire({
-                                icon: 'error',
-                                title: 'Failed!',
-                                text: result.message,
-                                confirmButtonText: 'OK'
-                            }).then((result) => {
-                                $('#requestModal').modal ('hide');
-                            });
+                        type: 'GET',
+                        url: `@Url.Action("GetScheduleByEventId", "NWR", new { area = "Other" })`,
+                        data: { idBook: id },
+                        success: function (res) {
+                            console.log("res", res);
+                            if (res && res.length > 0) {
+                                const eventData = res[0];
+                                $("#requestModal").modal('hide');
+                                $("#dateUpdate").val($("#dateRequest").val());
+                                $("#starttimeUpdate").val(startreq);
+                                $("#endtimeUpdate").val(endreq);
+                                $("#updateModal").modal('show');
+                                $("#usernameUpdate").val($("#usernameRequest").val());
+                                $("#roomtitleUpdate").val(activeRoomTitle);
+                                $("#attendanceUpdate").val($("#attendanceRequest").val());
+                                $("#subjectUpdate").val(eventData.subject);
+                            }
                         }
-                    }).always(function () {
-                        $submitButton.prop("disabled", false).text("Submit Request");
-                    });
-                });
-            } else {
-                Swal.fire({
-                    icon: 'warning',
-                    title: 'No Data Found',
-                    text: 'Could not retrieve event details. Please try again later.'
-                });
+                    })
+
+                }
+            });
+        } 
+        return;
+    }
+
+    // Rest of your existing code for form submission
+    var $submitButton = $(this).find("button[type='submit']");
+    $submitButton.prop("disabled", true).text("Submitting...");
+
+    var submitForm = new FormData(form);
+    var usernikr = $("#userIdRequest").val();
+
+    submitForm.append("idConflict", eventDetails.id);
+    submitForm.append("NIKConflict", eventDetails.user);
+    submitForm.append("startConflict", eventDetails.start);
+    submitForm.append("endConflict", eventDetails.end);
+    submitForm.append("NIKRequest", usernikr);
+
+    $.ajax({
+        type: 'POST',
+        url: "@Url.Action("SubmitRequest", "NWR", new { area = "Other" })",
+        tryCount: 0,
+        tryLimit: 3,
+        data: submitForm,
+        cache: false,
+        contentType: false,
+        processData: false,
+    }).done(function (result) {
+        if (result.status === 1) {
+            Swal.fire({
+                icon: 'success',
+                title: 'Success!',
+                text: result.message,
+                confirmButtonText: 'OK'
+            }).then((result) => {
+                $('#requestModal').modal('hide');
+                if (calendar) {
+                    calendar.gotoDate(conflictData.start);
+                    calendar.refetchEvents();
+                }
+            });
+        } else {
+            Swal.fire({
+                icon: 'error',
+                title: 'Failed!',
+                text: result.message,
+                confirmButtonText: 'OK'
+            }).then((result) => {
+                $('#requestModal').modal('hide');
+            });
+        }
+    }).always(function () {
+        $submitButton.prop("disabled", false).text("Submit Request");
+    });
+});
+
             }
         },
         error: function (xhr, status, error) {
@@ -1876,7 +1941,7 @@
                                     <span style="color: red;">*</span>
                                 </div>
                                 <div class="col-1">
-                                    <input type="number" class="form-control" id="attendanceRequest" name="attendanceRequest" min="1" />
+                                    <input type="number" class="form-control" id="attendanceRequest" name="attendanceRequest" min="1" value="1" />
                                 </div>
                             </div>
 
