@@ -17,7 +17,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="~/Scripts/tinymce/tinymce.min.js"></script>
 
-    <script>
+    @*<script>
         tinymce.init({
             selector: 'textarea#exportpdf',
             height: '800px',
@@ -29,15 +29,294 @@
             toolbar: "undo redo | styles | bold italic underline strikethrough | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image",
             image_caption: true,
         });
-    </script>
-
-    <script>
-
-    </script>
+    </script>*@
 
 }
 
-<div class="d-flex align-items-center rounded" style="color: #2C3E50;">
+<body class="bg-gray-100 p-6">
+
+    <!-- Header -->
+    <div class="flex items-center rounded text-[#2C3E50] mb-4">
+        <span class="text-[#F6AA04] font-bold text-xl mr-2">|</span>
+        <h2 class="font-bold text-xl">Detail Working Order</h2>
+    </div>
+
+    <div class="flex justify-center">
+        <button onclick="generateFullDoc()"
+                class="mb-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
+            Preview Full Document
+        </button>
+    </div>
+
+
+    <!-- Wrapper for all content -->
+    <div class="mb-4 bg-white border shadow mx-auto" style="width: 21cm; min-height: 29.7cm; padding: 2cm; font-size: 10pt;">
+
+        <!-- Letterhead -->
+        <div id="letterhead">
+            <div class="flex justify-between items-center">
+                <img src="https://placehold.co/100x50" alt="Logo 1" />
+                <div class="text-center text-sm">
+                    <p class="font-bold">PT Niterra Mobility Indonesia</p>
+                    <p>Jl. Raya Jakarta-Bogor Km. 26,6 Ciracas</p>
+                    <p>Jakarta Timur, Indonesia</p>
+                </div>
+                <img src="https://placehold.co/80x50" alt="Logo 2" />
+            </div>
+            <hr class="mt-2 border-t border-black" />
+            <p class="text-lg font-bold text-center underline mt-4">
+                WORKING ORDER CONFIRMATION
+            </p>
+            <p class="text-sm font-bold text-center underline">##NUMBER##</p>
+        </div>
+
+        <!-- Letter Body -->
+        <table id="letterbody" class="table-auto w-full mt-4">
+            <tbody>
+                <tr>
+                    <td class="align-top w-[170px]">To</td>
+                    <td><span id="vendor" name="vendor">##VENDOR##</span></td>
+                </tr>
+                <tr>
+                    <td class="align-top w-[170px]">Attn</td>
+                    <td>
+                        <input type="text"
+                               name="attn"
+                               id="attn"
+                               class="border rounded w-full" />
+                    </td>
+                </tr>
+                <tr>
+                    <td class="align-top w-[170px]">Ref Quotation No & Date</td>
+                    <td>
+                        <input type="text"
+                               name="ref"
+                               id="ref"
+                               class="border rounded w-full" />
+                    </td>
+                </tr>
+                <tr>
+                    <td class="align-top w-[170px]">Project</td>
+                    <td>
+                        <input type="text"
+                               name="project"
+                               id="project"
+                               class="border rounded w-full" />
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="2">
+                        <textarea id="project-field" class="w-full mt-2">
+                        <table class="table-auto border border-gray-400 border-collapse">
+                        <thead>
+                        <tr>
+                        <th class="border border-gray-400 px-2">No.</th>
+                        <th class="border border-gray-400 px-2">Type</th>
+                        <th class="border border-gray-400 px-2">Qty</th>
+                            </tr>
+                          </thead>
+                        <tbody>
+                        <tr>
+                        <td class="border border-gray-400 px-2"></td>
+                        <td class="border border-gray-400 px-2"></td>
+                        <td class="border border-gray-400 px-2"></td>
+                            </tr>
+                        <tr>
+                        <td class="border border-gray-400 px-2"></td>
+                        <td class="border border-gray-400 px-2"></td>
+                        <td class="border border-gray-400 px-2"></td>
+                            </tr>
+                          </tbody>
+                        </table>
+                </textarea>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="align-top w-[170px]">Date</td>
+                    <td><span id="date" name="date">##DATENOW##</span></td>
+                </tr>
+                <tr>
+                    <td class="align-top w-[170px]">Total</td>
+                    <td>
+                        <input type="text"
+                               name="total"
+                               id="total"
+                               class="border rounded w-full" />
+                    </td>
+                </tr>
+                <tr>
+                    <td class="align-top w-[170px]">Payment Term</td>
+                    <td>
+                        <input type="text"
+                               name="payment"
+                               id="payment"
+                               class="border rounded w-full" />
+                    </td>
+                </tr>
+                <tr>
+                    <td class="align-top w-[170px]">Start Date</td>
+                    <td>
+                        <input type="text"
+                               name="startDate"
+                               id="startDate"
+                               class="border rounded w-full" />
+                    </td>
+                </tr>
+                <tr>
+                    <td class="align-top w-[170px]">End Date</td>
+                    <td>
+                        <input type="text"
+                               name="endDate"
+                               id="endDate"
+                               class="border rounded w-full" />
+                    </td>
+                </tr>
+                <tr>
+                    <td class="align-top w-[170px]">BUDGET NO</td>
+                    <td>
+                        <select name="budgetNo"
+                                id="budgetNo"
+                                class="border rounded w-full">
+                            <option value="">Select Budget No</option>
+                            <option value="1">Budget 1</option>
+                            <option value="2">Budget 2</option>
+                            <option value="3">Budget 3</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="align-top w-[170px]">Remark</td>
+                    <td>
+                        <input type="text"
+                               name="remark"
+                               id="remark"
+                               class="border rounded w-full" />
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        <p>Please attach working order confirmation together with Invoice.</p>
+
+
+        <!-- Approval Section -->
+        <div id="approval">
+            <div class="flex justify-end gap-12 mb-6">
+                <div class="flex flex-col items-center gap-1">
+                    <div class="text-[12px]">Approved By:</div>
+                    <div class="w-12 h-12 bg-zinc-300 rounded-full"></div>
+                    <div class="text-[12px] font-bold">(##NAMEAPPROVED##)</div>
+                </div>
+                <div class="flex flex-col items-center gap-1">
+                    <div class="text-[12px]">Prepared By:</div>
+                    <div class="w-12 h-12 bg-zinc-300 rounded-full"></div>
+                    <div class="text-[12px] font-bold">(#NAMEPREPARED##)</div>
+                </div>
+            </div>
+            <div class="flex flex-col items-start gap-1 mb-6 text-[10px] font-bold">
+                <div class="mb-[50px]">CONFIRMATION RECEIVED BY SUPPLIER</div>
+                <div>(NAME / SIGN / COMPANY STAMP)</div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Combined Preview Output -->
+    <div id="result" class="mt-6 flex justify-center hidden">
+
+        <div style="width: 21cm; min-height: 29.7cm; padding: 2cm; font-size: 10pt;" class="bg-white border shadow text-[10pt]"></div>
+    </div>
+
+    <div id="previewModal" class="fixed inset-0 z-50 hidden bg-black bg-opacity-50 flex items-center justify-center">
+        <div class="bg-white p-6 rounded shadow-xl overflow-y-auto max-h-[90vh] w-[90vw] relative">
+            <button onclick="closeModal()"
+                    class="absolute top-2 right-2 bg-red-500 text-white rounded-full px-3 py-1 text-xs hover:bg-red-600">
+                Close
+            </button>
+            <div id="modalContent" class="text-[10pt]"></div>
+        </div>
+    </div>
+
+
+    <!-- TinyMCE Setup + Script -->
+    <script>
+        tinymce.init({
+            selector: "#project-field",
+            height: 300,
+            base_url: "/node_modules/tinymce",
+            plugins: "table code lists",
+            toolbar:
+                "undo redo | fontselect | sizeselect | bold italic | alignleft aligncenter alignright | bullist numlist | table | code ",
+            menubar: false,
+        });
+
+        function generateFullDoc() {
+            const modal = document.getElementById("previewModal");
+            const modalContent = document.getElementById("modalContent");
+
+            const letterhead = document.getElementById("letterhead").outerHTML;
+            const approval = document.getElementById("approval").outerHTML;
+            const projectContent = tinymce.get("project-field").getContent();
+
+            const attn = document.getElementById("attn").value;
+            const ref = document.getElementById("ref").value;
+            const project = document.getElementById("project").value;
+            const date = document.getElementById("date")?.innerText ?? "";
+            const total = document.getElementById("total").value;
+            const payment = document.getElementById("payment").value;
+            const startDate = document.getElementById("startDate").value;
+            const endDate = document.getElementById("endDate").value;
+            const budgetNo = document.getElementById("budgetNo").value;
+            const remark = document.getElementById("remark").value;
+            const vendor = document.getElementById("vendor")?.innerText ?? "##VENDOR##";
+
+            const letterbody = `
+        <table class="table-auto w-full text-[10px]">
+          <tbody>
+            <tr><td class="w-[170px] align-top">To</td><td>: ${vendor}</td></tr>
+            <tr><td class="align-top">Attn</td><td>: ${attn}</td></tr>
+            <tr><td class="align-top">Ref Quotation No & Date</td><td>: ${ref}</td></tr>
+            <tr><td class="align-top">Project</td><td>: ${project}<br>${projectContent}</td></tr>
+            <tr><td class="align-top">Date</td><td>: ${date}</td></tr>
+            <tr><td class="align-top">Total</td><td>: ${total}</td></tr>
+            <tr><td class="align-top">Payment Term</td><td>: ${payment}</td></tr>
+            <tr><td class="align-top">Start Date</td><td>: ${startDate}</td></tr>
+            <tr><td class="align-top">End Date</td><td>: ${endDate}</td></tr>
+            <tr><td class="align-top">BUDGET NO</td><td>: ${budgetNo}</td></tr>
+            <tr><td class="align-top">Remark</td><td>: ${remark}</td></tr>
+          </tbody>
+        </table>
+        <p class="text-[10px] mt-2">Please attach working order confirmation together with Invoice.</p>
+      `;
+
+            const fullDoc = `
+        <div style="width: 21cm; height: 29.7cm; padding: 2cm; font-size: 10pt;" class="bg-white border shadow mx-auto">
+          ${letterhead}
+          <div class="mt-6">${letterbody}</div>
+          <div class="mt-6">${approval}</div>
+        </div>
+      `;
+
+            modalContent.innerHTML = fullDoc;
+            modal.classList.remove("hidden");
+        }
+        // Fungsi untuk menutup modal
+        function closeModal() {
+            document.getElementById("previewModal").classList.add("hidden");
+        }
+
+        // Event listener untuk klik di luar konten modal
+        document.addEventListener("click", function (e) {
+            const modal = document.getElementById("previewModal");
+            const modalContent = document.getElementById("modalContent");
+            if (!modal.classList.contains("hidden") && modal.contains(e.target) && !modalContent.contains(e.target)) {
+                closeModal();
+            }
+        });
+
+    </script>
+</body>
+
+@*<div class="d-flex align-items-center rounded" style="color: #2C3E50;">
     <span style="color: #F6AA04; font-weight: bold; font-size: 20px; margin: 20px;">|</span>
     <h2 style="font-weight: bold; margin: 0; font-size: 20px">
         Detail Working Order
@@ -46,6 +325,6 @@
 
 <div class="max-w-full mx-auto bg-white p-6 rounded-xl shadow-lg">
     <textarea id="exportpdf">hiii</textarea>
-</div>
+</div>*@
 
 
