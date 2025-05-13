@@ -27,8 +27,8 @@ namespace NGKBusi.Areas.Purchasing.Controllers
             string date = now.ToString("dd-MM-yyyy");
 
             var user = db.V_Users_Active.FirstOrDefault(u => u.NIK == currUserId);
-
             ViewBag.vendorList = db.AX_Vendor_List.Where(w => w.IsActive == true && w.VENDGROUP != "OTH").ToList();
+            ViewBag.budgetList = db.V_FA_BudgetSystem_BEX_BEL.Where(w => w.Latest == 1).ToList();
             ViewBag.currUsr = currUserId;
             ViewBag.currDate = date;
             ViewBag.currUsrName = user?.Name ?? "unknown";
@@ -80,6 +80,19 @@ namespace NGKBusi.Areas.Purchasing.Controllers
             return Json(new { datas }, JsonRequestBehavior.AllowGet);
         }
 
+        public JsonResult GetBudgetList()
+        {
+            var datas = db.V_FA_BudgetSystem_BEX_BEL
+                .Where(w => w.Latest == 1)
+                .Select(data => new
+                {
+                    data.id,
+                    data.Budget_No,
+                    data.Description
+                }).ToList();
+
+            return Json(new { datas }, JsonRequestBehavior.AllowGet);
+        }
 
 
         public String toRomawi(string month)
@@ -253,6 +266,7 @@ namespace NGKBusi.Areas.Purchasing.Controllers
 
         public ActionResult Detail(int id)
         {
+            ViewBag.budgetList = db.V_FA_BudgetSystem_BEX_BEL.Where(w => w.Latest == 1).ToList();
 
             return View();
         }

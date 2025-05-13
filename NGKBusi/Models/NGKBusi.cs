@@ -2243,6 +2243,7 @@ namespace NGKBusi.Models
     {
         public int id { get; set; }
         public int rel_id { get; set; }
+        public int Latest { get; set; }
         public string Period_FY { get; set; }
         public int Period_Year { get; set; }
         public string Budget_Type { get; set; }
@@ -2286,7 +2287,6 @@ namespace NGKBusi.Models
         public int Approval { get; set; }
         public int Approval_Sub { get; set; }
         public bool? Is_Reject { get; set; }
-        public int Latest { get; set; }
         public int Final_Version { get; set; }
     }
     public class V_FA_BudgetSystem_BIP_CIP_CFA

@@ -2,13 +2,29 @@
 @{
     ViewBag.Title = "Detail Working Order";
     Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.NavHide = true;
 
 }
 
 @section cssHead {
+    <link href="~/Content/sweetalert2/sweetalert2.min.css" rel="stylesheet" />
     <style>
         .page-content {
             padding-top: 0 !important;
+        }
+
+        #modalContent table.mce-table,
+        #modalContent table.mce-table th,
+        #modalContent table.mce-table td {
+            border: 1px solid black !important;
+            border-collapse: collapse !important;
+        }
+
+        .tox-edit-area table.mce-table,
+        .tox-edit-area table.mce-table th,
+        .tox-edit-area table.mce-table td {
+            border: 1px solid black !important;
+            border-collapse: collapse !important;
         }
     </style>
 }
@@ -16,20 +32,78 @@
 @section scriptHead {
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="~/Scripts/tinymce/tinymce.min.js"></script>
+    <script src="~/Content/sweetalert2/sweetalert2@11.js"></script>
 
-    @*<script>
-        tinymce.init({
-            selector: 'textarea#exportpdf',
-            height: '800px',
-            plugins: [
-                "advlist", "anchor", "autolink", "charmap", "code", "codesample", "fullscreen",
-                "help", "image", "insertdatetime", "link", "lists", "media",
-                "preview", "searchreplace", "table", "visualblocks",
-            ],
-            toolbar: "undo redo | styles | bold italic underline strikethrough | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image",
-            image_caption: true,
-        });
-    </script>*@
+    <script>
+       function getQueryParam(name) {
+           const urlParams = new URLSearchParams(window.location.search);
+           return urlParams.get(name);
+       }
+
+        $(document).ready(function () {
+
+            $("#budgetNo").select2({
+                dropdownParent: $("#letterbody"),
+                width: "100%",
+            });
+
+
+           const id = getQueryParam("id");
+           if (id) {
+               $.ajax({
+                   url: '@Url.Action("GetDataById", "WorkingOrder", new { area = "Purchasing" })',
+                   type: 'GET',
+                   data: { id: id },
+                   success: function (res) {
+                       if (res && res.datas) {
+                           console.log(res.datas);
+
+                               const data = res.datas;
+                               $("#vendor").text(data.VendorName);
+                               $('#number').text(data.Number);
+                               const today = new Date().toISOString().split('T')[0];
+                               const formattedDate = new Date(today).toLocaleDateString('en-US', {
+                                   month: 'long',
+                                   day: 'numeric',
+                                   year: 'numeric'
+                               });
+                               $('#date').text(formattedDate);
+
+
+                       } else {
+                           Swal.fire('Error!', 'No data found for the selected ID.', 'error');
+                       }
+                   },
+                   error: function () {
+                       Swal.fire('Error!', 'Failed to retrieve schedule data.', 'error');
+                   }
+               });
+           }
+       });
+
+        @*function getBudgetList() {
+              $.ajax({
+              url: '@Url.Action("GetBudgetList", "WorkingOrder", new { area = "Purchasing" })',
+              type: 'GET',
+              success: function (res) {
+                  if (res && res.datas) {
+                      console.log(res.datas);
+
+                          const data = res.datas;
+                          $("#budget").text(data.Budget_No);
+                          $('#description').text(data.Description);
+
+                  } else {
+                      Swal.fire('Error!', 'No data found for the selected ID.', 'error');
+                  }
+              },
+              error: function () {
+                  Swal.fire('Error!', 'Failed to retrieve schedule data.', 'error');
+              }
+          });
+        }*@
+
+    </script>
 
 }
 
@@ -55,19 +129,21 @@
         <!-- Letterhead -->
         <div id="letterhead">
             <div class="flex justify-between items-center">
-                <img src="https://placehold.co/100x50" alt="Logo 1" />
+                <img src="~/Content/Images/niterra-logo.jpg" alt="logo" width="100" height="50" />
+                @*<img src="https://placehold.co/100x50" alt="Logo 1" />*@
                 <div class="text-center text-sm">
                     <p class="font-bold">PT Niterra Mobility Indonesia</p>
                     <p>Jl. Raya Jakarta-Bogor Km. 26,6 Ciracas</p>
                     <p>Jakarta Timur, Indonesia</p>
                 </div>
-                <img src="https://placehold.co/80x50" alt="Logo 2" />
+                <img src="~/Content/Images/tuv-image.png" width="80" height="50" alt="tuv" />
+                @*<img src="https://placehold.co/80x50" alt="Logo 2" />*@
             </div>
             <hr class="mt-2 border-t border-black" />
             <p class="text-lg font-bold text-center underline mt-4">
                 WORKING ORDER CONFIRMATION
             </p>
-            <p class="text-sm font-bold text-center underline">##NUMBER##</p>
+            <p id="number" name="number" class="text-sm font-bold text-center underline"></p>
         </div>
 
         <!-- Letter Body -->
@@ -75,7 +151,7 @@
             <tbody>
                 <tr>
                     <td class="align-top w-[170px]">To</td>
-                    <td><span id="vendor" name="vendor">##VENDOR##</span></td>
+                    <td><span id="vendor" name="vendor"></span></td>
                 </tr>
                 <tr>
                     <td class="align-top w-[170px]">Attn</td>
@@ -83,7 +159,8 @@
                         <input type="text"
                                name="attn"
                                id="attn"
-                               class="border rounded w-full" />
+                               placeholder="Attention"
+                               class="border rounded w-full px-2" />
                     </td>
                 </tr>
                 <tr>
@@ -92,7 +169,8 @@
                         <input type="text"
                                name="ref"
                                id="ref"
-                               class="border rounded w-full" />
+                               placeholder="Ref Quotation No & Date"
+                               class="border rounded w-full px-2" />
                     </td>
                 </tr>
                 <tr>
@@ -101,32 +179,33 @@
                         <input type="text"
                                name="project"
                                id="project"
-                               class="border rounded w-full" />
+                               placeholder="Project Title"
+                               class="border rounded w-full px-2" />
                     </td>
                 </tr>
                 <tr>
                     <td colspan="2">
-                        <textarea id="project-field" class="w-full mt-2">
-                        <table class="table-auto border border-gray-400 border-collapse">
-                        <thead>
+                        <textarea id="project-field" class="w-full mt-2 borderTable">
+                        <table class="table-auto border border-black border-collapse customTable mce-table">
+                        @*<thead>
                         <tr>
-                        <th class="border border-gray-400 px-2">No.</th>
-                        <th class="border border-gray-400 px-2">Type</th>
-                        <th class="border border-gray-400 px-2">Qty</th>
+                        <th class="border border-black px-2">No.</th>
+                        <th class="border border-black px-2">Type</th>
+                        <th class="border border-black px-2">Qty</th>
                             </tr>
                           </thead>
                         <tbody>
                         <tr>
-                        <td class="border border-gray-400 px-2"></td>
-                        <td class="border border-gray-400 px-2"></td>
-                        <td class="border border-gray-400 px-2"></td>
+                        <td class="border border-black px-2"></td>
+                        <td class="border border-black px-2"></td>
+                        <td class="border border-black px-2"></td>
                             </tr>
                         <tr>
-                        <td class="border border-gray-400 px-2"></td>
-                        <td class="border border-gray-400 px-2"></td>
-                        <td class="border border-gray-400 px-2"></td>
+                        <td class="border border-black px-2"></td>
+                        <td class="border border-black px-2"></td>
+                        <td class="border border-black px-2"></td>
                             </tr>
-                          </tbody>
+                          </tbody>*@
                         </table>
                 </textarea>
                     </td>
@@ -141,7 +220,8 @@
                         <input type="text"
                                name="total"
                                id="total"
-                               class="border rounded w-full" />
+                               placeholder="Total"
+                               class="border rounded w-full px-2" />
                     </td>
                 </tr>
                 <tr>
@@ -150,7 +230,8 @@
                         <input type="text"
                                name="payment"
                                id="payment"
-                               class="border rounded w-full" />
+                               placeholder="Payment Term"
+                               class="border rounded w-full px-2" />
                     </td>
                 </tr>
                 <tr>
@@ -159,7 +240,8 @@
                         <input type="text"
                                name="startDate"
                                id="startDate"
-                               class="border rounded w-full" />
+                               placeholder="Start Date"
+                               class="border rounded w-full px-2" />
                     </td>
                 </tr>
                 <tr>
@@ -168,20 +250,24 @@
                         <input type="text"
                                name="endDate"
                                id="endDate"
-                               class="border rounded w-full" />
+                               placeholder="End Date"
+                               class="border rounded w-full px-2" />
                     </td>
                 </tr>
                 <tr>
-                    <td class="align-top w-[170px]">BUDGET NO</td>
+                    <td class="align-top w-[170px]">Budget No</td>
                     <td>
-                        <select name="budgetNo"
-                                id="budgetNo"
-                                class="border rounded w-full">
+                        <select name="budgetNo" id="budgetNo" class="border rounded w-full">
                             <option value="">Select Budget No</option>
-                            <option value="1">Budget 1</option>
-                            <option value="2">Budget 2</option>
-                            <option value="3">Budget 3</option>
+                            <option value="Budget 1">UNB</option>
+                            @foreach (var data in ViewBag.budgetList)
+                            {
+                                <option value="@data.Budget_No">
+                                    @(data.Budget_No + " | " + data.Description)
+                                </option>
+                            }
                         </select>
+
                     </td>
                 </tr>
                 <tr>
@@ -190,7 +276,8 @@
                         <input type="text"
                                name="remark"
                                id="remark"
-                               class="border rounded w-full" />
+                               placeholder="Remark"
+                               class="border rounded w-full px-2" />
                     </td>
                 </tr>
             </tbody>
@@ -245,9 +332,37 @@
             base_url: "/node_modules/tinymce",
             plugins: "table code lists",
             toolbar:
-                "undo redo | fontselect | sizeselect | bold italic | alignleft aligncenter alignright | bullist numlist | table | code ",
+                "undo redo | fontselect | sizeselect | bold italic | alignleft aligncenter alignright | bullist numlist | table tablemergecells tablesplitcells | code ",
             menubar: false,
+            content_style: `
+                    table {
+                        border-collapse: collapse !important;
+                        width: 100% !important;
+                    }
+                    table td,
+                    table th {
+                        border: 1px solid black !important;
+                    }
+                `,
+            table_default_attributes: {
+                border: '1',
+                class: 'mce-table'
+            },
+            table_default_styles: {
+                'border-collapse': 'collapse',
+                'width': '100%',
+                'border': '1px solid black'
+            },
+            table_cell_default_styles: {
+                'border': '1px solid black'
+            },
+            setup: function (editor) {
+                editor.on('NewTable', function (e) {
+                    e.table.className += ' mce-table';
+                });
+            }
         });
+
 
         function generateFullDoc() {
             const modal = document.getElementById("previewModal");
@@ -255,7 +370,7 @@
 
             const letterhead = document.getElementById("letterhead").outerHTML;
             const approval = document.getElementById("approval").outerHTML;
-            const projectContent = tinymce.get("project-field").getContent();
+            const projectContent = tinymce.get("project-field").getContent().replace(/<table/g, '<table class="mce-table"');
 
             const attn = document.getElementById("attn").value;
             const ref = document.getElementById("ref").value;
@@ -270,31 +385,31 @@
             const vendor = document.getElementById("vendor")?.innerText ?? "##VENDOR##";
 
             const letterbody = `
-        <table class="table-auto w-full text-[10px]">
-          <tbody>
-            <tr><td class="w-[170px] align-top">To</td><td>: ${vendor}</td></tr>
-            <tr><td class="align-top">Attn</td><td>: ${attn}</td></tr>
-            <tr><td class="align-top">Ref Quotation No & Date</td><td>: ${ref}</td></tr>
-            <tr><td class="align-top">Project</td><td>: ${project}<br>${projectContent}</td></tr>
-            <tr><td class="align-top">Date</td><td>: ${date}</td></tr>
-            <tr><td class="align-top">Total</td><td>: ${total}</td></tr>
-            <tr><td class="align-top">Payment Term</td><td>: ${payment}</td></tr>
-            <tr><td class="align-top">Start Date</td><td>: ${startDate}</td></tr>
-            <tr><td class="align-top">End Date</td><td>: ${endDate}</td></tr>
-            <tr><td class="align-top">BUDGET NO</td><td>: ${budgetNo}</td></tr>
-            <tr><td class="align-top">Remark</td><td>: ${remark}</td></tr>
-          </tbody>
-        </table>
-        <p class="text-[10px] mt-2">Please attach working order confirmation together with Invoice.</p>
-      `;
+                    <table class="table-auto w-full text-[10px]">
+                      <tbody>
+                        <tr><td class="w-[170px] align-top">To</td><td>: ${vendor}</td></tr>
+                        <tr><td class="align-top">Attn</td><td>: ${attn}</td></tr>
+                        <tr><td class="align-top">Ref Quotation No & Date</td><td>: ${ref}</td></tr>
+                        <tr><td class="align-top">Project</td><td>: ${project}<br>${projectContent}</td></tr>
+                        <tr><td class="align-top">Date</td><td>: ${date}</td></tr>
+                        <tr><td class="align-top">Total</td><td>: ${total}</td></tr>
+                        <tr><td class="align-top">Payment Term</td><td>: ${payment}</td></tr>
+                        <tr><td class="align-top">Start Date</td><td>: ${startDate}</td></tr>
+                        <tr><td class="align-top">End Date</td><td>: ${endDate}</td></tr>
+                        <tr><td class="align-top">BUDGET NO</td><td>: ${budgetNo}</td></tr>
+                        <tr><td class="align-top">Remark</td><td>: ${remark}</td></tr>
+                      </tbody>
+                    </table>
+                    <p class="text-[10px] mt-2">Please attach working order confirmation together with Invoice.</p>
+                  `;
 
             const fullDoc = `
-        <div style="width: 21cm; height: 29.7cm; padding: 2cm; font-size: 10pt;" class="bg-white border shadow mx-auto">
-          ${letterhead}
-          <div class="mt-6">${letterbody}</div>
-          <div class="mt-6">${approval}</div>
-        </div>
-      `;
+                    <div style="width: 21cm; height: 29.7cm; padding: 2cm; font-size: 10pt;" class="bg-white border shadow mx-auto">
+                      ${letterhead}
+                      <div class="mt-6">${letterbody}</div>
+                      <div class="mt-6">${approval}</div>
+                    </div>
+                  `;
 
             modalContent.innerHTML = fullDoc;
             modal.classList.remove("hidden");
@@ -317,14 +432,14 @@
 </body>
 
 @*<div class="d-flex align-items-center rounded" style="color: #2C3E50;">
-    <span style="color: #F6AA04; font-weight: bold; font-size: 20px; margin: 20px;">|</span>
-    <h2 style="font-weight: bold; margin: 0; font-size: 20px">
-        Detail Working Order
-    </h2>
-</div>
+        <span style="color: #F6AA04; font-weight: bold; font-size: 20px; margin: 20px;">|</span>
+        <h2 style="font-weight: bold; margin: 0; font-size: 20px">
+            Detail Working Order
+        </h2>
+    </div>
 
-<div class="max-w-full mx-auto bg-white p-6 rounded-xl shadow-lg">
-    <textarea id="exportpdf">hiii</textarea>
-</div>*@
+    <div class="max-w-full mx-auto bg-white p-6 rounded-xl shadow-lg">
+        <textarea id="exportpdf">hiii</textarea>
+    </div>*@
 
 

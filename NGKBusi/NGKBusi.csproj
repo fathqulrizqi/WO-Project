@@ -3636,6 +3636,7 @@
     <Content Include="Content\Images\menuPE.jpg" />
     <Content Include="Content\Images\ngk-logo.png" />
     <Content Include="Content\Images\niterra-logo.jpg" />
+    <Content Include="Content\Images\tuv-image.png" />
     <Content Include="Content\Images\user.jpg" />
     <Content Include="Content\IT\MasterList.css" />
     <Content Include="Content\IT\ServiceRequest.css" />
@@ -4479,6 +4480,7 @@
     <Content Include="Areas\Purchasing\Views\_ViewStart.cshtml" />
     <Content Include="Areas\Purchasing\Views\WorkingOrder\index.cshtml" />
     <Content Include="Areas\Purchasing\Views\WorkingOrder\detail.cshtml" />
+    <Content Include="Areas\Purchasing\Views\WorkingOrder\Partial\Modal.cshtml" />
     <None Include="Properties\PublishProfiles\NGKBusi.pubxml" />
     <Content Include="Content\animsition\animsition.css" />
     <Content Include="Content\animsition\animsition.min.css" />
@@ -7273,6 +7275,8 @@
     <Content Include="Views\Account\Login - Copy.cshtml" />
     <Content Include="Views\User\Login - Copy.cshtml" />
     <Content Include="Views\User\Login.cshtml" />
+    <Content Include="Scripts\moment.min.js.map" />
+    <Content Include="Scripts\moment-with-locales.min.js.map" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
