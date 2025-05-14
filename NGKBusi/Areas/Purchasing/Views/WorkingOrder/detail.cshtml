@@ -8,6 +8,7 @@
 
 @section cssHead {
     <link href="~/Content/sweetalert2/sweetalert2.min.css" rel="stylesheet" />
+    <link href="~/Content/air-datepicker/air-datepicker.css" rel="stylesheet" />
     <style>
         .page-content {
             padding-top: 0 !important;
@@ -33,6 +34,8 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="~/Scripts/tinymce/tinymce.min.js"></script>
     <script src="~/Content/sweetalert2/sweetalert2@11.js"></script>
+    <script src="~/Content/air-datepicker/air-datepicker.js"></script>
+    <script src="~/Content/air-datepicker/locale/en.js"></script>
 
     <script>
        function getQueryParam(name) {
@@ -81,35 +84,38 @@
            }
        });
 
-        @*function getBudgetList() {
-              $.ajax({
-              url: '@Url.Action("GetBudgetList", "WorkingOrder", new { area = "Purchasing" })',
-              type: 'GET',
-              success: function (res) {
-                  if (res && res.datas) {
-                      console.log(res.datas);
-
-                          const data = res.datas;
-                          $("#budget").text(data.Budget_No);
-                          $('#description').text(data.Description);
-
-                  } else {
-                      Swal.fire('Error!', 'No data found for the selected ID.', 'error');
-                  }
-              },
-              error: function () {
-                  Swal.fire('Error!', 'Failed to retrieve schedule data.', 'error');
-              }
-          });
-        }*@
-
     </script>
+
+    @*<script>
+            document.addEventListener('DOMContentLoaded', function () {
+                function datepicker(selector) {
+                    new AirDatepicker(selector, {
+                        dateFormat: 'dd-MM-yyyy',
+                        minDate: new Date(),
+                        locale: {
+                            days: ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
+                            daysShort: ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"],
+                            daysMin: ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"],
+                            months: ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"],
+                            monthsShort: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
+                            today: "Today",
+                            clear: "Clear",
+                            firstDay: 0
+                        },
+                    });
+                }
+
+                datepicker("#startDate");
+                datepicker("#endDate");
+            });
+        </script>*@
+
+    
 
 }
 
 <body class="bg-gray-100 p-6">
 
-    <!-- Header -->
     <div class="flex items-center rounded text-[#2C3E50] mb-4">
         <span class="text-[#F6AA04] font-bold text-xl mr-2">|</span>
         <h2 class="font-bold text-xl">Detail Working Order</h2>
@@ -117,16 +123,16 @@
 
     <div class="flex justify-center">
         <button onclick="generateFullDoc()"
-                class="mb-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
+                class="mb-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 mx-2">
             Preview Full Document
+        </button>
+        <button class="mb-4 px-4 py-2 bg-orange-600 text-white rounded hover:bg-orange-700">
+            Save Changes
         </button>
     </div>
 
-
-    <!-- Wrapper for all content -->
     <div class="mb-4 bg-white border shadow mx-auto" style="width: 21cm; min-height: 29.7cm; padding: 2cm; font-size: 10pt;">
-
-        <!-- Letterhead -->
+        <!-- Letter Head -->
         <div id="letterhead">
             <div class="flex justify-between items-center">
                 <img src="~/Content/Images/niterra-logo.jpg" alt="logo" width="100" height="50" />
@@ -324,7 +330,6 @@
     </div>
 
 
-    <!-- TinyMCE Setup + Script -->
     <script>
         tinymce.init({
             selector: "#project-field",
@@ -335,15 +340,15 @@
                 "undo redo | fontselect | sizeselect | bold italic | alignleft aligncenter alignright | bullist numlist | table tablemergecells tablesplitcells | code ",
             menubar: false,
             content_style: `
-                    table {
-                        border-collapse: collapse !important;
-                        width: 100% !important;
-                    }
-                    table td,
-                    table th {
-                        border: 1px solid black !important;
-                    }
-                `,
+                table {
+                    border-collapse: collapse !important;
+                    width: 100% !important;
+                }
+                table td,
+                table th {
+                    border: 1px solid black !important;
+                }
+            `,
             table_default_attributes: {
                 border: '1',
                 class: 'mce-table'
@@ -385,41 +390,39 @@
             const vendor = document.getElementById("vendor")?.innerText ?? "##VENDOR##";
 
             const letterbody = `
-                    <table class="table-auto w-full text-[10px]">
-                      <tbody>
-                        <tr><td class="w-[170px] align-top">To</td><td>: ${vendor}</td></tr>
-                        <tr><td class="align-top">Attn</td><td>: ${attn}</td></tr>
-                        <tr><td class="align-top">Ref Quotation No & Date</td><td>: ${ref}</td></tr>
-                        <tr><td class="align-top">Project</td><td>: ${project}<br>${projectContent}</td></tr>
-                        <tr><td class="align-top">Date</td><td>: ${date}</td></tr>
-                        <tr><td class="align-top">Total</td><td>: ${total}</td></tr>
-                        <tr><td class="align-top">Payment Term</td><td>: ${payment}</td></tr>
-                        <tr><td class="align-top">Start Date</td><td>: ${startDate}</td></tr>
-                        <tr><td class="align-top">End Date</td><td>: ${endDate}</td></tr>
-                        <tr><td class="align-top">BUDGET NO</td><td>: ${budgetNo}</td></tr>
-                        <tr><td class="align-top">Remark</td><td>: ${remark}</td></tr>
-                      </tbody>
-                    </table>
-                    <p class="text-[10px] mt-2">Please attach working order confirmation together with Invoice.</p>
-                  `;
+                                                        <table class="table-auto w-full text-[10px]">
+                                                          <tbody>
+                                                            <tr><td class="w-[170px] align-top">To</td><td>: ${vendor}</td></tr>
+                                                            <tr><td class="align-top">Attn</td><td>: ${attn}</td></tr>
+                                                            <tr><td class="align-top">Ref Quotation No & Date</td><td>: ${ref}</td></tr>
+                                                            <tr><td class="align-top">Project</td><td>: ${project}<br>${projectContent}</td></tr>
+                                                            <tr><td class="align-top">Date</td><td>: ${date}</td></tr>
+                                                            <tr><td class="align-top">Total</td><td>: ${total}</td></tr>
+                                                            <tr><td class="align-top">Payment Term</td><td>: ${payment}</td></tr>
+                                                            <tr><td class="align-top">Start Date</td><td>: ${startDate}</td></tr>
+                                                            <tr><td class="align-top">End Date</td><td>: ${endDate}</td></tr>
+                                                            <tr><td class="align-top">BUDGET NO</td><td>: ${budgetNo}</td></tr>
+                                                            <tr><td class="align-top">Remark</td><td>: ${remark}</td></tr>
+                                                          </tbody>
+                                                        </table>
+                                                        <p class="text-[10px] mt-2">Please attach working order confirmation together with Invoice.</p>
+                                                      `;
 
             const fullDoc = `
-                    <div style="width: 21cm; height: 29.7cm; padding: 2cm; font-size: 10pt;" class="bg-white border shadow mx-auto">
-                      ${letterhead}
-                      <div class="mt-6">${letterbody}</div>
-                      <div class="mt-6">${approval}</div>
-                    </div>
-                  `;
+                                                        <div style="width: 21cm; height: 29.7cm; padding: 2cm; font-size: 10pt;" class="bg-white border shadow mx-auto">
+                                                          ${letterhead}
+                                                          <div class="mt-6">${letterbody}</div>
+                                                          <div class="mt-6">${approval}</div>
+                                                        </div>
+                                                      `;
 
             modalContent.innerHTML = fullDoc;
             modal.classList.remove("hidden");
         }
-        // Fungsi untuk menutup modal
         function closeModal() {
             document.getElementById("previewModal").classList.add("hidden");
         }
 
-        // Event listener untuk klik di luar konten modal
         document.addEventListener("click", function (e) {
             const modal = document.getElementById("previewModal");
             const modalContent = document.getElementById("modalContent");
@@ -429,17 +432,56 @@
         });
 
     </script>
+
+    <script>
+        const startInput = document.getElementById('startDate');
+        const endInput = document.getElementById('endDate');
+
+        const picker = new AirDatepicker(startInput, {
+            range: true,
+            minDate: new Date(),
+            dateFormat: 'dd-MM-yyyy',
+            multipleDatesSeparator: ' - ',
+            locale: {
+                days: ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
+                daysShort: ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"],
+                daysMin: ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"],
+                months: ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"],
+                monthsShort: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
+                today: "Today",
+                clear: "Clear",
+                firstDay: 0
+            },
+            onSelect({ date }) {
+                if (Array.isArray(date)) {
+                    if (date.length >= 1) {
+                        startInput.value = formatDate(date[0]);
+                    }
+                    if (date.length === 2) {
+                        endInput.value = formatDate(date[1]);
+                    } else {
+                        endInput.value = '';
+                    }
+                }
+            },
+            onHide() {
+                picker.setViewDate(new Date());
+            }
+        });
+
+        function formatDate(date) {
+            const d = new Date(date);
+            const day = String(d.getDate()).padStart(2, '0');
+            const month = String(d.getMonth() + 1).padStart(2, '0');
+            const year = d.getFullYear();
+            return `${day}-${month}-${year}`;
+        }
+
+        endInput.addEventListener('click', () => {
+            picker.show();
+        });
+    </script>
+
+
 </body>
-
-@*<div class="d-flex align-items-center rounded" style="color: #2C3E50;">
-        <span style="color: #F6AA04; font-weight: bold; font-size: 20px; margin: 20px;">|</span>
-        <h2 style="font-weight: bold; margin: 0; font-size: 20px">
-            Detail Working Order
-        </h2>
-    </div>
-
-    <div class="max-w-full mx-auto bg-white p-6 rounded-xl shadow-lg">
-        <textarea id="exportpdf">hiii</textarea>
-    </div>*@
-
 
