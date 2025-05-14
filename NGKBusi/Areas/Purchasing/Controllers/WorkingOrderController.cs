@@ -12,6 +12,8 @@ using System.Text.RegularExpressions;
 using DocumentFormat.OpenXml.Drawing.Spreadsheet;
 using System.Windows.Interop;
 using static System.Data.Entity.Infrastructure.Design.Executor;
+using NGKBusi.Areas.WebService.Models;
+using DocumentFormat.OpenXml.Presentation;
 
 namespace NGKBusi.Areas.Purchasing.Controllers
 {
@@ -80,21 +82,6 @@ namespace NGKBusi.Areas.Purchasing.Controllers
             return Json(new { datas }, JsonRequestBehavior.AllowGet);
         }
 
-        public JsonResult GetBudgetList()
-        {
-            var datas = db.V_FA_BudgetSystem_BEX_BEL
-                .Where(w => w.Latest == 1)
-                .Select(data => new
-                {
-                    data.id,
-                    data.Budget_No,
-                    data.Description
-                }).ToList();
-
-            return Json(new { datas }, JsonRequestBehavior.AllowGet);
-        }
-
-
         public String toRomawi(string month)
         {
             var romawi = "";
@@ -147,11 +134,8 @@ namespace NGKBusi.Areas.Purchasing.Controllers
         public JsonResult CreateData()
         {
 
-            var dateStr = Request["Date"];
-            string format = "dd-MM-yyyy";
             DateTime date;
-
-            if (!DateTime.TryParseExact(dateStr, format, CultureInfo.InvariantCulture, DateTimeStyles.None, out date))
+            if (!ParseDateFromRequest("Date", out date))
             {
                 return Json(new { success = false, message = "Invalid date format. Please use 'dd-MM-yyyy'." }, JsonRequestBehavior.AllowGet);
             }
@@ -217,6 +201,15 @@ namespace NGKBusi.Areas.Purchasing.Controllers
 
         }
 
+        private bool ParseDateFromRequest(string key, out DateTime date)
+        {
+            date = default(DateTime);
+            string dateStr = Request[key];
+            string format = "dd-MM-yyyy";
+
+            return DateTime.TryParseExact(dateStr, format, CultureInfo.InvariantCulture, DateTimeStyles.None, out date);
+        }
+
 
         [HttpPost]
         public JsonResult UpdateData(int id)
@@ -269,6 +262,122 @@ namespace NGKBusi.Areas.Purchasing.Controllers
             ViewBag.budgetList = db.V_FA_BudgetSystem_BEX_BEL.Where(w => w.Latest == 1).ToList();
 
             return View();
+        }
+
+        [HttpPost, ValidateInput(false)]
+        public JsonResult SaveLetter(int id)
+        {
+            var idlist = id;
+            string number = Request["Number"];
+            var vendor = Request["Vendor"];
+            var attn = Request["Attn"];
+            var refs = Request["Ref"];
+            var project = Request["Project"];
+            var html = Request["Html"];
+
+            DateTime date;
+            if (!ParseDateFromRequest("Date", out date))
+            {
+                return Json(new { success = false, message = "Invalid date format. Please use 'dd-MM-yyyy'." }, JsonRequestBehavior.AllowGet);
+            }
+
+            decimal total;
+            if (!ParseDecimalFromRequest("Total", out total))
+            {
+                return Json(new { success = false, message = "Invalid total format. Please input a valid number." }, JsonRequestBehavior.AllowGet);
+            }
+
+            var paymentterm = Request["PaymentTerm"];
+
+            DateTime startdate;
+            if (!ParseDateFromRequest("Date", out startdate))
+            {
+                return Json(new { success = false, message = "Invalid date format. Please use 'dd-MM-yyyy'." }, JsonRequestBehavior.AllowGet);
+            }
+
+            DateTime enddate;
+            if (!ParseDateFromRequest("Date", out enddate))
+            {
+                return Json(new { success = false, message = "Invalid date format. Please use 'dd-MM-yyyy'." }, JsonRequestBehavior.AllowGet);
+            }
+            var budgetno = Request["BudgetNo"];
+            var budgetdesc = Request["BudgetDesc"];
+            var remark = Request["Remark"];
+
+            Purchasing_WorkingOrder_Letter data = new Purchasing_WorkingOrder_Letter
+            {
+                IDList = idlist,
+                Number = number,
+                Vendor = vendor,
+                Attn = attn,
+                Ref = refs,
+                Project = project,
+                Html = html,
+                Date = date,
+                Total = total,
+                PaymentTerm = paymentterm,
+                StartDate = startdate,
+                EndDate = enddate,
+                BudgetNo = budgetno,
+                BudgetDesc = budgetdesc,
+                Remark = remark
+            };
+
+            dbm.Purchasing_WorkingOrder_Letter.Add(data);
+            int saveWO = dbm.SaveChanges();
+
+            if (saveWO > 0)
+            {
+                return Json(new { success = true, message = "Working Order Saved Successfully", id = data.ID }, JsonRequestBehavior.AllowGet);
+            }
+            else
+            {
+                return Json(new { success = false, message = "Failed to Save Working Order" }, JsonRequestBehavior.AllowGet);
+            }
+        }
+
+        private bool ParseDecimalFromRequest(string key, out decimal value)
+        {
+            value = 0;
+            string valStr = Request[key];
+
+            if (!string.IsNullOrWhiteSpace(valStr))
+            {
+                valStr = valStr.Replace(",", "").Replace("Rp", "").Trim();
+            }
+
+            return decimal.TryParse(valStr, NumberStyles.Any, CultureInfo.InvariantCulture, out value);
+        }
+
+        public JsonResult GetLetterById(int id)
+        {
+            var data = dbm.Purchasing_WorkingOrder_Letter.Where(w => w.IDList == id).FirstOrDefault();
+            if (data == null)
+            {
+                return Json(new { success = false }, JsonRequestBehavior.AllowGet);
+            }
+
+            return Json(new
+            {
+                success = true,
+                data = new
+                {
+                    data.Number,
+                    data.Vendor,
+                    data.Attn,
+                    data.Ref,
+                    data.Project,
+                    data.Html,
+                    data.Date,
+                    data.Total,
+                    data.PaymentTerm,
+                    data.StartDate,
+                    data.EndDate,
+                    data.BudgetNo,
+                    data.BudgetDesc,
+                    data.Remark
+                }
+            }, JsonRequestBehavior.AllowGet);
         }
 
     }

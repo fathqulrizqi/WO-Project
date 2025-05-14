@@ -35,7 +35,6 @@
     <script src="~/Scripts/tinymce/tinymce.min.js"></script>
     <script src="~/Content/sweetalert2/sweetalert2@11.js"></script>
     <script src="~/Content/air-datepicker/air-datepicker.js"></script>
-    <script src="~/Content/air-datepicker/locale/en.js"></script>
 
     <script>
        function getQueryParam(name) {
@@ -64,13 +63,17 @@
                                const data = res.datas;
                                $("#vendor").text(data.VendorName);
                                $('#number').text(data.Number);
-                               const today = new Date().toISOString().split('T')[0];
-                               const formattedDate = new Date(today).toLocaleDateString('en-US', {
-                                   month: 'long',
-                                   day: 'numeric',
-                                   year: 'numeric'
-                               });
-                               $('#date').text(formattedDate);
+                               const today = new Date();
+                               const formatted = `${String(today.getDate()).padStart(2, '0')}-${String(today.getMonth() + 1).padStart(2, '0')}-${today.getFullYear()}`;
+
+                               //const today = new Date().toISOString().split('T')[0];
+                               //const formattedDate = new Date(today).toLocaleDateString('en-US', {
+                               //    month: 'long',
+                               //    day: 'numeric',
+                               //    year: 'numeric'
+                               //});
+                           $('#date').text(formatted);
+                           loadLetterDetail(id);
 
 
                        } else {
@@ -83,6 +86,107 @@
                });
            }
        });
+
+    </script>
+
+    <script>
+        function saveLetterData() {
+    const id = getQueryParam("id"); // ID dari query string (misal ?id=5)
+
+    $.ajax({
+        url: '@Url.Action("SaveLetter", "WorkingOrder", new { area = "Purchasing" })',
+        type: 'POST',
+        data: {
+            id: id,
+            Number: $("#number").text(),
+            Vendor: $("#vendor").text(),
+            Attn: $("#attn").val(),
+            Ref: $("#ref").val(),
+            Project: $("#project").val(),
+            Html: tinymce.get("project-field").getContent(),
+            Date: $("#date").text(), 
+            Total: $("#total").val(),
+            PaymentTerm: $("#paymentTerm").val(),
+            StartDate: $("#startDate").val(),
+            EndDate: $("#endDate").val(),
+            BudgetNo: $("#budgetNo").val(),
+            BudgetDesc: $("#budgetDesc").val(),
+            Remark: $("#remark").val()
+        },
+        success: function (response) {
+            if (response.success) {
+                Swal.fire({
+                title: 'Success',
+                text: response.message,
+                icon: 'success',
+                timer: 1500,
+                showConfirmButton: false
+            }).then(() => {
+                window.location.href = '@Url.Action("Detail", "WorkingOrder", new { area = "Purchasing" })' + '?id=' + response.id;
+            });
+            } else {
+                Swal.fire('Error', response.message, 'error');
+            }
+        },
+        error: function () {
+            Swal.fire('Error', 'Something went wrong', 'error');
+        }
+    });
+
+}
+        function loadLetterDetail(id) {
+            $.ajax({
+                url: '@Url.Action("GetLetterById", "WorkingOrder", new { area = "Purchasing" })',
+                method: 'GET',
+                data: { id: id },
+                success: function (response) {
+                    if (response.success) {
+                        $('#attn').val(response.data.Attn);
+                        $('#ref').val(response.data.Ref);
+                        $('#project').val(response.data.Project);
+                        tinymce.get('project-field').setContent(response.data.Html);
+                        $('#date').val(response.data.Date);
+                        $('#total').val(formatRupiah(response.data.Total));
+
+                        $('#payment').val(response.data.PaymentTerm);
+
+                        $('#startDate').val(formatDotNetDate(response.data.StartDate));
+                        $('#endDate').val(formatDotNetDate(response.data.EndDate));
+
+                        $('#budgetNo').val(response.data.BudgetNo + '|' + response.data.BudgetDesc);
+                        $('#remark').val(response.data.Remark);
+
+                    } 
+                },
+                error: function () {
+                    Swal.fire('Error', 'Failed to load detail', 'error');
+                }
+            });
+        }
+        function formatRupiah(angka) {
+            const numberString = angka.toString().replace(/[^,\d]/g, '');
+            const split = numberString.split(',');
+            let sisa = split[0].length % 3;
+            let rupiah = split[0].substr(0, sisa);
+            const ribuan = split[0].substr(sisa).match(/\d{3}/gi);
+
+            if (ribuan) {
+                const separator = sisa ? '.' : '';
+                rupiah += separator + ribuan.join('.');
+            }
+
+            rupiah = split[1] !== undefined ? rupiah + ',' + split[1] : rupiah;
+            return 'Rp ' + rupiah;
+        }
+
+        function formatDotNetDate(dotNetDate) {
+            const timestamp = parseInt(dotNetDate.replace(/[^0-9]/g, ""));
+            const date = new Date(timestamp);
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, '0'); 
+            const day = String(date.getDate()).padStart(2, '0');
+            return `${day}-${month}-${year}`; 
+        }
 
     </script>
 
@@ -126,9 +230,11 @@
                 class="mb-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 mx-2">
             Preview Full Document
         </button>
-        <button class="mb-4 px-4 py-2 bg-orange-600 text-white rounded hover:bg-orange-700">
+        <button onclick="saveLetterData()"
+                class="mb-4 px-4 py-2 bg-orange-600 text-white rounded hover:bg-orange-700">
             Save Changes
         </button>
+
     </div>
 
     <div class="mb-4 bg-white border shadow mx-auto" style="width: 21cm; min-height: 29.7cm; padding: 2cm; font-size: 10pt;">
@@ -390,31 +496,31 @@
             const vendor = document.getElementById("vendor")?.innerText ?? "##VENDOR##";
 
             const letterbody = `
-                                                        <table class="table-auto w-full text-[10px]">
-                                                          <tbody>
-                                                            <tr><td class="w-[170px] align-top">To</td><td>: ${vendor}</td></tr>
-                                                            <tr><td class="align-top">Attn</td><td>: ${attn}</td></tr>
-                                                            <tr><td class="align-top">Ref Quotation No & Date</td><td>: ${ref}</td></tr>
-                                                            <tr><td class="align-top">Project</td><td>: ${project}<br>${projectContent}</td></tr>
-                                                            <tr><td class="align-top">Date</td><td>: ${date}</td></tr>
-                                                            <tr><td class="align-top">Total</td><td>: ${total}</td></tr>
-                                                            <tr><td class="align-top">Payment Term</td><td>: ${payment}</td></tr>
-                                                            <tr><td class="align-top">Start Date</td><td>: ${startDate}</td></tr>
-                                                            <tr><td class="align-top">End Date</td><td>: ${endDate}</td></tr>
-                                                            <tr><td class="align-top">BUDGET NO</td><td>: ${budgetNo}</td></tr>
-                                                            <tr><td class="align-top">Remark</td><td>: ${remark}</td></tr>
-                                                          </tbody>
-                                                        </table>
-                                                        <p class="text-[10px] mt-2">Please attach working order confirmation together with Invoice.</p>
-                                                      `;
+            <table class="table-auto w-full text-[10px]">
+                <tbody>
+                <tr><td class="w-[170px] align-top">To</td><td>: ${vendor}</td></tr>
+                <tr><td class="align-top">Attn</td><td>: ${attn}</td></tr>
+                <tr><td class="align-top">Ref Quotation No & Date</td><td>: ${ref}</td></tr>
+                <tr><td class="align-top">Project</td><td>: ${project}<br>${projectContent}</td></tr>
+                <tr><td class="align-top">Date</td><td>: ${date}</td></tr>
+                <tr><td class="align-top">Total</td><td>: ${total}</td></tr>
+                <tr><td class="align-top">Payment Term</td><td>: ${payment}</td></tr>
+                <tr><td class="align-top">Start Date</td><td>: ${startDate}</td></tr>
+                <tr><td class="align-top">End Date</td><td>: ${endDate}</td></tr>
+                <tr><td class="align-top">BUDGET NO</td><td>: ${budgetNo}</td></tr>
+                <tr><td class="align-top">Remark</td><td>: ${remark}</td></tr>
+                </tbody>
+            </table>
+            <p class="text-[10px] mt-2">Please attach working order confirmation together with Invoice.</p>
+            `;
 
             const fullDoc = `
-                                                        <div style="width: 21cm; height: 29.7cm; padding: 2cm; font-size: 10pt;" class="bg-white border shadow mx-auto">
-                                                          ${letterhead}
-                                                          <div class="mt-6">${letterbody}</div>
-                                                          <div class="mt-6">${approval}</div>
-                                                        </div>
-                                                      `;
+            <div style="width: 21cm; height: 29.7cm; padding: 2cm; font-size: 10pt;" class="bg-white border shadow mx-auto">
+                ${letterhead}
+                <div class="mt-6">${letterbody}</div>
+                <div class="mt-6">${approval}</div>
+            </div>
+            `;
 
             modalContent.innerHTML = fullDoc;
             modal.classList.remove("hidden");
