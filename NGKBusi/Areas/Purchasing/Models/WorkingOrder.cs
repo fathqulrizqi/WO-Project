@@ -34,18 +34,18 @@ namespace NGKBusi.Areas.Purchasing.Models
         public int IDList { get; set; }
         public string Number { get; set; }
         public string Vendor { get; set; }
-        public string Attn { get; set; }
-        public string Ref { get; set; }
-        public string Project { get; set; }
-        public string Html { get; set; }
+        public string Attn { get; set; } = string.Empty;
+        public string Ref { get; set; } = string.Empty;
+        public string Project { get; set; } = string.Empty;
+        public string Html { get; set; } = string.Empty;
         public DateTime Date { get; set; }
-        public decimal Total { get; set; }
-        public string PaymentTerm { get; set; }
-        public DateTime StartDate { get; set; }
-        public DateTime EndDate { get; set; }
+        public decimal? Total { get; set; } 
+        public string PaymentTerm { get; set; } = string.Empty;
+        public DateTime? StartDate { get; set; }
+        public DateTime? EndDate { get; set; }
         public string BudgetNo { get; set; }
         public string BudgetDesc { get; set; }
-        public string Remark { get; set; }
+        public string Remark { get; set; } = string.Empty;
     }
 
     public class WOConnection : DbContext

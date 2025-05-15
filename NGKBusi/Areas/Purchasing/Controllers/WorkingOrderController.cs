@@ -1,19 +1,20 @@
-﻿using System;
+﻿using DocumentFormat.OpenXml.Drawing.Spreadsheet;
+using DocumentFormat.OpenXml.Presentation;
+using Microsoft.AspNet.Identity;
+using Microsoft.AspNetCore.Mvc;
+using NGKBusi.Areas.Purchasing.Models;
+using NGKBusi.Areas.WebService.Models;
+using NGKBusi.Models;
+using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
+using System.Net.PeerToPeer;
+using System.Text.RegularExpressions;
 using System.Web;
 using System.Web.Mvc;
-using NGKBusi.Models;
-using Microsoft.AspNet.Identity;
-using System.Globalization;
-using NGKBusi.Areas.Purchasing.Models;
-using Microsoft.AspNetCore.Mvc;
-using System.Text.RegularExpressions;
-using DocumentFormat.OpenXml.Drawing.Spreadsheet;
 using System.Windows.Interop;
 using static System.Data.Entity.Infrastructure.Design.Executor;
-using NGKBusi.Areas.WebService.Models;
-using DocumentFormat.OpenXml.Presentation;
 
 namespace NGKBusi.Areas.Purchasing.Controllers
 {
@@ -33,7 +34,7 @@ namespace NGKBusi.Areas.Purchasing.Controllers
             ViewBag.budgetList = db.V_FA_BudgetSystem_BEX_BEL.Where(w => w.Latest == 1).ToList();
             ViewBag.currUsr = currUserId;
             ViewBag.currDate = date;
-            ViewBag.currUsrName = user?.Name ?? "unknown";
+            ViewBag.currUsrName = user?.Name ?? "";
 
             return View();
         }
@@ -142,11 +143,11 @@ namespace NGKBusi.Areas.Purchasing.Controllers
 
             var userNik = Request["NIK"];
             var un = db.Users.FirstOrDefault(w => w.NIK == userNik);
-            var username = un != null ? un.Name : "Unknown User";
+            var username = un != null ? un.Name : "";
 
             var vendor = Request["selVendorList"];
             var vn = db.AX_Vendor_List.FirstOrDefault(w => w.ACCOUNTNUM == vendor);
-            var vendorname = vn != null ? vn.Name : "Unknown Vendor";
+            var vendorname = vn != null ? vn.Name : "";
 
             var subject = Request["Subject"];
 
@@ -218,11 +219,11 @@ namespace NGKBusi.Areas.Purchasing.Controllers
 
             var userNik = Request["NIK"];
             var un = db.Users.FirstOrDefault(w => w.NIK == userNik);
-            var username = un != null ? un.Name : "Unknown User";
+            var username = un != null ? un.Name : "";
 
             var vendor = Request["selVendorList"];
             var vn = db.AX_Vendor_List.FirstOrDefault(w => w.ACCOUNTNUM == vendor);
-            var vendorname = vn != null ? vn.Name : "Unknown Vendor";
+            var vendorname = vn != null ? vn.Name : "";
 
             var subject = Request["Subject"];
             var number = Request["Number"];
@@ -265,9 +266,9 @@ namespace NGKBusi.Areas.Purchasing.Controllers
         }
 
         [HttpPost, ValidateInput(false)]
-        public JsonResult SaveLetter(int id)
+        public JsonResult SaveLetter()
         {
-            var idlist = id;
+            var idlist = Int32.Parse(Request["IDList"]);
             string number = Request["Number"];
             var vendor = Request["Vendor"];
             var attn = Request["Attn"];
@@ -281,28 +282,56 @@ namespace NGKBusi.Areas.Purchasing.Controllers
                 return Json(new { success = false, message = "Invalid date format. Please use 'dd-MM-yyyy'." }, JsonRequestBehavior.AllowGet);
             }
 
-            decimal total;
-            if (!ParseDecimalFromRequest("Total", out total))
+            decimal? total = null;
+            var totalRequestValue = Request["Total"];
+            if (!string.IsNullOrEmpty(totalRequestValue))
             {
-                return Json(new { success = false, message = "Invalid total format. Please input a valid number." }, JsonRequestBehavior.AllowGet);
+                totalRequestValue = totalRequestValue.Replace(',', '.');
+                if (!decimal.TryParse(totalRequestValue, NumberStyles.Any, CultureInfo.InvariantCulture, out decimal parsedTotal))
+                {
+                    return Json(new { success = false, message = "Invalid total format. Please input a valid number." }, JsonRequestBehavior.AllowGet);
+                }
+                total = parsedTotal; 
             }
 
             var paymentterm = Request["PaymentTerm"];
 
-            DateTime startdate;
-            if (!ParseDateFromRequest("Date", out startdate))
+            DateTime? startdate = null; 
+            var startDateRequestValue = Request["StartDate"];
+            if (!string.IsNullOrEmpty(startDateRequestValue))
             {
-                return Json(new { success = false, message = "Invalid date format. Please use 'dd-MM-yyyy'." }, JsonRequestBehavior.AllowGet);
+                if (!ParseDateFromRequest("StartDate", out DateTime parsedStartDate))
+                {
+                    return Json(new { success = false, message = "Invalid date start format. Please use 'dd-MM-yyyy'." }, JsonRequestBehavior.AllowGet);
+                }
+                startdate = parsedStartDate; 
             }
 
-            DateTime enddate;
-            if (!ParseDateFromRequest("Date", out enddate))
+            DateTime? enddate = null;
+            var endDateRequestValue = Request["EndDate"];
+            if (!string.IsNullOrEmpty(endDateRequestValue))
             {
-                return Json(new { success = false, message = "Invalid date format. Please use 'dd-MM-yyyy'." }, JsonRequestBehavior.AllowGet);
+                if (!ParseDateFromRequest("EndDate", out DateTime parsedEndDate))
+                {
+                    return Json(new { success = false, message = "Invalid date end format. Please use 'dd-MM-yyyy'." }, JsonRequestBehavior.AllowGet);
+                }
+                enddate = parsedEndDate; 
             }
+
             var budgetno = Request["BudgetNo"];
-            var budgetdesc = Request["BudgetDesc"];
+            var budgets = db.V_FA_BudgetSystem_BEX_BEL.FirstOrDefault(w => w.Budget_No == budgetno);
+            var budgetdesc = budgets != null ? budgets.Description : "";
             var remark = Request["Remark"];
+
+            var existing = dbm.Purchasing_WorkingOrder_Letter.FirstOrDefault(w => w.IDList == idlist);
+            if (existing != null)
+            {
+                return Json(new
+                {
+                    success = false,
+                    message = "Data surat sudah pernah disimpan. Silakan gunakan fitur update."
+                }, JsonRequestBehavior.AllowGet);
+            }
 
             Purchasing_WorkingOrder_Letter data = new Purchasing_WorkingOrder_Letter
             {
@@ -328,11 +357,104 @@ namespace NGKBusi.Areas.Purchasing.Controllers
 
             if (saveWO > 0)
             {
-                return Json(new { success = true, message = "Working Order Saved Successfully", id = data.ID }, JsonRequestBehavior.AllowGet);
+                return Json(new { success = true, message = "Working Order Saved Successfully", id = data.IDList }, JsonRequestBehavior.AllowGet);
             }
             else
             {
                 return Json(new { success = false, message = "Failed to Save Working Order" }, JsonRequestBehavior.AllowGet);
+            }
+        }
+
+
+        [HttpPost, ValidateInput(false)]
+        public JsonResult UpdateLetter(int id)
+        {
+            string idListStr = Request["IDList"];
+            int idlist;
+            if (!int.TryParse(idListStr, out idlist))
+            {
+                return Json(new { success = false, message = "Invalid IDList format" }, JsonRequestBehavior.AllowGet);
+            }
+            string number = Request["Number"];
+            var vendor = Request["Vendor"];
+            var attn = Request["Attn"];
+            var refs = Request["Ref"];
+            var project = Request["Project"];
+            var html = Request["Html"];
+
+            DateTime date;
+            if (!ParseDateFromRequest("Date", out date))
+            {
+                return Json(new { success = false, message = "Invalid date format. Please use 'dd-MM-yyyy'." }, JsonRequestBehavior.AllowGet);
+            }
+
+            decimal? total = null;
+            var totalRequestValue = Request["Total"];
+            if (!string.IsNullOrEmpty(totalRequestValue))
+            {
+                totalRequestValue = totalRequestValue.Replace(',', '.');
+                if (!decimal.TryParse(totalRequestValue, NumberStyles.Any, CultureInfo.InvariantCulture, out decimal parsedTotal))
+                {
+                    return Json(new { success = false, message = "Invalid total format. Please input a valid number." }, JsonRequestBehavior.AllowGet);
+                }
+                total = parsedTotal;
+            }
+
+            var paymentterm = Request["PaymentTerm"];
+
+            DateTime? startdate = null;
+            var startDateRequestValue = Request["StartDate"];
+            if (!string.IsNullOrEmpty(startDateRequestValue))
+            {
+                if (!ParseDateFromRequest("StartDate", out DateTime parsedStartDate))
+                {
+                    return Json(new { success = false, message = "Invalid date start format. Please use 'dd-MM-yyyy'." }, JsonRequestBehavior.AllowGet);
+                }
+                startdate = parsedStartDate;
+            }
+
+            DateTime? enddate = null;
+            var endDateRequestValue = Request["EndDate"];
+            if (!string.IsNullOrEmpty(endDateRequestValue))
+            {
+                if (!ParseDateFromRequest("EndDate", out DateTime parsedEndDate))
+                {
+                    return Json(new { success = false, message = "Invalid date end format. Please use 'dd-MM-yyyy'." }, JsonRequestBehavior.AllowGet);
+                }
+                enddate = parsedEndDate;
+            }
+
+            var budgetno = Request["BudgetNo"];
+            var budgets = db.V_FA_BudgetSystem_BEX_BEL.FirstOrDefault(w => w.Budget_No == budgetno);
+            var budgetdesc = budgets != null ? budgets.Description : "";
+            var remark = Request["Remark"];
+
+            var data = dbm.Purchasing_WorkingOrder_Letter.First(w => w.ID == id);
+            data.IDList = idlist;
+            data.Number = number;
+            data.Vendor = vendor;
+            data.Attn = attn;
+            data.Ref = refs;
+            data.Project = project;
+            data.Html = html;
+            data.Date = date;
+            data.Total = total;
+            data.PaymentTerm = paymentterm;
+            data.StartDate = startdate;
+            data.EndDate = enddate;
+            data.BudgetNo = budgetno;
+            data.BudgetDesc = budgetdesc;
+            data.Remark = remark;
+
+            int updateWO = dbm.SaveChanges();
+
+            if (updateWO > 0)
+            {
+                return Json(new { success = true, message = "Working Order Updated Successfully" }, JsonRequestBehavior.AllowGet);
+            }
+            else
+            {
+                return Json(new { success = false, message = "Failed Update Working Order" }, JsonRequestBehavior.AllowGet);
             }
         }
 
@@ -357,11 +479,15 @@ namespace NGKBusi.Areas.Purchasing.Controllers
                 return Json(new { success = false }, JsonRequestBehavior.AllowGet);
             }
 
+            var budget = db.V_FA_BudgetSystem_BEX_BEL.FirstOrDefault(w => w.Budget_No == data.BudgetNo);
+
             return Json(new
             {
                 success = true,
                 data = new
                 {
+                    data.ID,
+                    data.IDList,
                     data.Number,
                     data.Vendor,
                     data.Attn,
@@ -373,12 +499,13 @@ namespace NGKBusi.Areas.Purchasing.Controllers
                     data.PaymentTerm,
                     data.StartDate,
                     data.EndDate,
-                    data.BudgetNo,
-                    data.BudgetDesc,
+                    BudgetNo = data.BudgetNo,  
+                    BudgetDesc = budget != null ? budget.Description : "",
                     data.Remark
                 }
             }, JsonRequestBehavior.AllowGet);
         }
+
 
     }
 }

@@ -36,157 +36,230 @@
     <script src="~/Content/sweetalert2/sweetalert2@11.js"></script>
     <script src="~/Content/air-datepicker/air-datepicker.js"></script>
 
+    <script src="@Url.Content("~/Scripts/accounting.min.js")"></script>
+
     <script>
        function getQueryParam(name) {
            const urlParams = new URLSearchParams(window.location.search);
            return urlParams.get(name);
        }
 
-        $(document).ready(function () {
-
+       $(document).ready(function () {
             $("#budgetNo").select2({
                 dropdownParent: $("#letterbody"),
                 width: "100%",
             });
 
+           $("#savebutton").off("click").on("click", function (e) {
+               e.preventDefault();
 
-           const id = getQueryParam("id");
-           if (id) {
-               $.ajax({
-                   url: '@Url.Action("GetDataById", "WorkingOrder", new { area = "Purchasing" })',
-                   type: 'GET',
-                   data: { id: id },
-                   success: function (res) {
-                       if (res && res.datas) {
-                           console.log(res.datas);
+               const idLetter = $("#idLetter").val();
 
-                               const data = res.datas;
-                               $("#vendor").text(data.VendorName);
-                               $('#number').text(data.Number);
-                               const today = new Date();
-                               const formatted = `${String(today.getDate()).padStart(2, '0')}-${String(today.getMonth() + 1).padStart(2, '0')}-${today.getFullYear()}`;
-
-                               //const today = new Date().toISOString().split('T')[0];
-                               //const formattedDate = new Date(today).toLocaleDateString('en-US', {
-                               //    month: 'long',
-                               //    day: 'numeric',
-                               //    year: 'numeric'
-                               //});
-                           $('#date').text(formatted);
-                           loadLetterDetail(id);
+               if (idLetter && idLetter !== "0") {
+                   UpdateLetterData();
+               } else {
+                   SaveLetterData();
+               }
+           });
 
 
-                       } else {
-                           Swal.fire('Error!', 'No data found for the selected ID.', 'error');
-                       }
-                   },
-                   error: function () {
-                       Swal.fire('Error!', 'Failed to retrieve schedule data.', 'error');
-                   }
-               });
-           }
-       });
+    const queryId = getQueryParam("id"); 
+    if (queryId) {
+        $.ajax({
+            url: '@Url.Action("GetDataById", "WorkingOrder", new { area = "Purchasing" })',
+            type: 'GET',
+            data: { id: queryId },
+            success: function (res) {
+                if (res && res.datas) {
+                    const data = res.datas;
+
+                    // Populate basic info
+                    $("#vendor").text(data.VendorName);
+                    $('#number').text(data.Number);
+
+                    const today = new Date();
+                    const formatted = `${String(today.getDate()).padStart(2, '0')}-${String(today.getMonth() + 1).padStart(2, '0')}-${today.getFullYear()}`;
+                    $('#date').text(formatted);
+
+                    // Set hidden ID
+                    $("#idList").val(data.ID);
+
+                    // Coba load surat (letter) jika sudah ada
+                    loadLetterIfExists(data.ID);
+                }
+            },
+            error: function () {
+                Swal.fire('Error!', 'Failed to retrieve schedule data.', 'error');
+            }
+        });
+    }
+
+    $("#total").on("input", function () {
+        let cursorPos = this.selectionStart;
+        let originalLength = this.value.length;
+        let numeric = unformatRupiah(this.value);
+        let formatted = formatRupiah(numeric);
+        $(this).val(formatted);
+        let newLength = formatted.length;
+        this.setSelectionRange(cursorPos + (newLength - originalLength), cursorPos + (newLength - originalLength));
+    });
+});
+
+function loadLetterIfExists(idList) {
+    $.ajax({
+        url: '@Url.Action("GetLetterById", "WorkingOrder", new { area = "Purchasing" })',
+        method: 'GET',
+        data: { id: idList },
+        success: function (response) {
+            if (response.success) {
+                
+                const d = response.data;
+                console.log('data', d);
+                $('#idLetter').val(d.ID);
+                $('#idList').val(d.IDList);
+                $('#number').val(d.Number);
+                $('#vendor').val(d.Vendor);
+                $('#attn').val(d.Attn);
+                $('#ref').val(d.Ref);
+                $('#project').val(d.Project);
+                tinymce.get('project-field').setContent(d.Html);
+                $('#date').val(formatDotNetDate(d.Date));
+                $("#total").val(formatRupiah(d.Total));
+                $('#payment').val(d.PaymentTerm);
+                $('#startDate').val(formatDotNetDate(d.StartDate));
+                $('#endDate').val(formatDotNetDate(d.EndDate));
+                $('#remark').val(d.Remark);
+
+                if (d.BudgetNo) {
+                    var newOption = new Option(d.BudgetNo + ' - ' + d.BudgetDesc, d.BudgetNo, true, true);
+                    $('#budgetNo').append(newOption).trigger('change');
+                }
+
+            }
+        },
+        error: function () {
+            Swal.fire('Error', 'Failed to load letter detail', 'error');
+        }
+    });
+}
+
 
     </script>
 
     <script>
-        function saveLetterData() {
-    const id = getQueryParam("id"); // ID dari query string (misal ?id=5)
 
-    $.ajax({
-        url: '@Url.Action("SaveLetter", "WorkingOrder", new { area = "Purchasing" })',
-        type: 'POST',
-        data: {
-            id: id,
-            Number: $("#number").text(),
-            Vendor: $("#vendor").text(),
-            Attn: $("#attn").val(),
-            Ref: $("#ref").val(),
-            Project: $("#project").val(),
-            Html: tinymce.get("project-field").getContent(),
-            Date: $("#date").text(), 
-            Total: $("#total").val(),
-            PaymentTerm: $("#paymentTerm").val(),
-            StartDate: $("#startDate").val(),
-            EndDate: $("#endDate").val(),
-            BudgetNo: $("#budgetNo").val(),
-            BudgetDesc: $("#budgetDesc").val(),
-            Remark: $("#remark").val()
-        },
-        success: function (response) {
+
+    function formatDotNetDate(dotNetDate) {
+        const timestamp = parseInt(dotNetDate.replace(/[^0-9]/g, ""));
+        const date = new Date(timestamp);
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+        return `${day}-${month}-${year}`;
+    }
+
+    function formatRupiah(value) {
+        return accounting.formatMoney(value, {
+            symbol: "Rp ",
+            precision: 0,
+            thousand: ".",
+            decimal: ","
+        });
+    }
+
+    function unformatRupiah(value) {
+        return value.replace(/[^0-9]/g, '');
+    }
+
+
+
+        function SaveLetterData() {
+        const totalValue = unformatRupiah($("#total").val());
+        const queryId = getQueryParam("id");
+
+        $.ajax({
+            url: '@Url.Action("SaveLetter", "WorkingOrder", new { area = "Purchasing" })',
+            type: 'POST',
+            data: {
+                IDList: $("#idList").val(),
+                Number: $("#number").text(),
+                Vendor: $("#vendor").text(),
+                Attn: $("#attn").val(),
+                Ref: $("#ref").val(),
+                Project: $("#project").val(),
+                Html: tinymce.get("project-field")?.getContent() || "",
+                Date: $("#date").text(),
+                Total: totalValue,
+                PaymentTerm: $("#payment").val(),
+                StartDate: $("#startDate").val(),
+                EndDate: $("#endDate").val(),
+                BudgetNo: $("#budgetNo").val(),
+                BudgetDesc: $("#budgetDesc").val(),
+                Remark: $("#remark").val()
+            },
+            success: function (response) {
             if (response.success) {
                 Swal.fire({
-                title: 'Success',
-                text: response.message,
-                icon: 'success',
-                timer: 1500,
-                showConfirmButton: false
-            }).then(() => {
-                window.location.href = '@Url.Action("Detail", "WorkingOrder", new { area = "Purchasing" })' + '?id=' + response.id;
-            });
-            } else {
-                Swal.fire('Error', response.message, 'error');
+                    title: 'Success',
+                    text: response.message,
+                    icon: 'success',
+                    showConfirmButton: false
+                }).then(() => {
+                    window.location.href = '@Url.Action("Detail", "WorkingOrder", new { area = "Purchasing" })' + '?id=' + queryId;
+                });
             }
         },
         error: function () {
             Swal.fire('Error', 'Something went wrong', 'error');
         }
-    });
+        });
+        }
 
-}
-        function loadLetterDetail(id) {
+        function UpdateLetterData() {
+            const totalValue = unformatRupiah($("#total").val());
+            const idList = $("#idList").val();
+
             $.ajax({
-                url: '@Url.Action("GetLetterById", "WorkingOrder", new { area = "Purchasing" })',
-                method: 'GET',
-                data: { id: id },
+                url: '@Url.Action("UpdateLetter", "WorkingOrder", new { area = "Purchasing" })',
+                type: 'POST',
+                data: {
+                    id: $("#idLetter").val(),
+                    IDList: $("#idList").val(),
+                    Number: $("#number").text(),
+                    Vendor: $("#vendor").text(),
+                    Attn: $("#attn").val(),
+                    Ref: $("#ref").val(),
+                    Project: $("#project").val(),
+                    Html: tinymce.get("project-field")?.getContent() || "",
+                    Date: $("#date").text(),
+                    Total: totalValue,
+                    PaymentTerm: $("#payment").val(),
+                    StartDate: $("#startDate").val(),
+                    EndDate: $("#endDate").val(),
+                    BudgetNo: $("#budgetNo").val(),
+                    BudgetDesc: $("#budgetDesc").val(),
+                    Remark: $("#remark").val()
+                },
                 success: function (response) {
                     if (response.success) {
-                        $('#attn').val(response.data.Attn);
-                        $('#ref').val(response.data.Ref);
-                        $('#project').val(response.data.Project);
-                        tinymce.get('project-field').setContent(response.data.Html);
-                        $('#date').val(response.data.Date);
-                        $('#total').val(formatRupiah(response.data.Total));
-
-                        $('#payment').val(response.data.PaymentTerm);
-
-                        $('#startDate').val(formatDotNetDate(response.data.StartDate));
-                        $('#endDate').val(formatDotNetDate(response.data.EndDate));
-
-                        $('#budgetNo').val(response.data.BudgetNo + '|' + response.data.BudgetDesc);
-                        $('#remark').val(response.data.Remark);
-
-                    } 
+                        Swal.fire({
+                            title: 'Success',
+                            text: response.message,
+                            icon: 'success',
+                            confirmButtonText: 'OK'
+                        }).then(() => {
+                            window.location.href = '@Url.Action("Detail", "WorkingOrder", new { area = "Purchasing" })' + '?id=' + queryId;
+                        });
+                    } else {
+                        Swal.fire('Error', response.message, 'error');
+                    }
                 },
                 error: function () {
-                    Swal.fire('Error', 'Failed to load detail', 'error');
+                    Swal.fire('Error', 'Something went wrong', 'error');
                 }
             });
         }
-        function formatRupiah(angka) {
-            const numberString = angka.toString().replace(/[^,\d]/g, '');
-            const split = numberString.split(',');
-            let sisa = split[0].length % 3;
-            let rupiah = split[0].substr(0, sisa);
-            const ribuan = split[0].substr(sisa).match(/\d{3}/gi);
 
-            if (ribuan) {
-                const separator = sisa ? '.' : '';
-                rupiah += separator + ribuan.join('.');
-            }
-
-            rupiah = split[1] !== undefined ? rupiah + ',' + split[1] : rupiah;
-            return 'Rp ' + rupiah;
-        }
-
-        function formatDotNetDate(dotNetDate) {
-            const timestamp = parseInt(dotNetDate.replace(/[^0-9]/g, ""));
-            const date = new Date(timestamp);
-            const year = date.getFullYear();
-            const month = String(date.getMonth() + 1).padStart(2, '0'); 
-            const day = String(date.getDate()).padStart(2, '0');
-            return `${day}-${month}-${year}`; 
-        }
 
     </script>
 
@@ -214,7 +287,7 @@
             });
         </script>*@
 
-    
+
 
 }
 
@@ -230,8 +303,8 @@
                 class="mb-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 mx-2">
             Preview Full Document
         </button>
-        <button onclick="saveLetterData()"
-                class="mb-4 px-4 py-2 bg-orange-600 text-white rounded hover:bg-orange-700">
+        <button class="mb-4 px-4 py-2 bg-orange-600 text-white rounded hover:bg-orange-700"
+                id="savebutton">
             Save Changes
         </button>
 
@@ -256,6 +329,8 @@
                 WORKING ORDER CONFIRMATION
             </p>
             <p id="number" name="number" class="text-sm font-bold text-center underline"></p>
+            <input type="hidden" id="idLetter" />
+            <input type="hidden" id="idList" />
         </div>
 
         <!-- Letter Body -->
@@ -324,7 +399,7 @@
                 </tr>
                 <tr>
                     <td class="align-top w-[170px]">Date</td>
-                    <td><span id="date" name="date">##DATENOW##</span></td>
+                    <td><span id="date" name="date"></span></td>
                 </tr>
                 <tr>
                     <td class="align-top w-[170px]">Total</td>
@@ -371,7 +446,7 @@
                     <td>
                         <select name="budgetNo" id="budgetNo" class="border rounded w-full">
                             <option value="">Select Budget No</option>
-                            <option value="Budget 1">UNB</option>
+                            <option value="UNB">UNB</option>
                             @foreach (var data in ViewBag.budgetList)
                             {
                                 <option value="@data.Budget_No">
@@ -446,15 +521,15 @@
                 "undo redo | fontselect | sizeselect | bold italic | alignleft aligncenter alignright | bullist numlist | table tablemergecells tablesplitcells | code ",
             menubar: false,
             content_style: `
-                table {
-                    border-collapse: collapse !important;
-                    width: 100% !important;
-                }
-                table td,
-                table th {
-                    border: 1px solid black !important;
-                }
-            `,
+                            table {
+                                border-collapse: collapse !important;
+                                width: 100% !important;
+                            }
+                            table td,
+                            table th {
+                                border: 1px solid black !important;
+                            }
+                        `,
             table_default_attributes: {
                 border: '1',
                 class: 'mce-table'
@@ -496,31 +571,31 @@
             const vendor = document.getElementById("vendor")?.innerText ?? "##VENDOR##";
 
             const letterbody = `
-            <table class="table-auto w-full text-[10px]">
-                <tbody>
-                <tr><td class="w-[170px] align-top">To</td><td>: ${vendor}</td></tr>
-                <tr><td class="align-top">Attn</td><td>: ${attn}</td></tr>
-                <tr><td class="align-top">Ref Quotation No & Date</td><td>: ${ref}</td></tr>
-                <tr><td class="align-top">Project</td><td>: ${project}<br>${projectContent}</td></tr>
-                <tr><td class="align-top">Date</td><td>: ${date}</td></tr>
-                <tr><td class="align-top">Total</td><td>: ${total}</td></tr>
-                <tr><td class="align-top">Payment Term</td><td>: ${payment}</td></tr>
-                <tr><td class="align-top">Start Date</td><td>: ${startDate}</td></tr>
-                <tr><td class="align-top">End Date</td><td>: ${endDate}</td></tr>
-                <tr><td class="align-top">BUDGET NO</td><td>: ${budgetNo}</td></tr>
-                <tr><td class="align-top">Remark</td><td>: ${remark}</td></tr>
-                </tbody>
-            </table>
-            <p class="text-[10px] mt-2">Please attach working order confirmation together with Invoice.</p>
-            `;
+                        <table class="table-auto w-full text-[10px]">
+                            <tbody>
+                            <tr><td class="w-[170px] align-top">To</td><td>: ${vendor}</td></tr>
+                            <tr><td class="align-top">Attn</td><td>: ${attn}</td></tr>
+                            <tr><td class="align-top">Ref Quotation No & Date</td><td>: ${ref}</td></tr>
+                            <tr><td class="align-top">Project</td><td>: ${project}<br>${projectContent}</td></tr>
+                            <tr><td class="align-top">Date</td><td>: ${date}</td></tr>
+                            <tr><td class="align-top">Total</td><td>: ${total}</td></tr>
+                            <tr><td class="align-top">Payment Term</td><td>: ${payment}</td></tr>
+                            <tr><td class="align-top">Start Date</td><td>: ${startDate}</td></tr>
+                            <tr><td class="align-top">End Date</td><td>: ${endDate}</td></tr>
+                            <tr><td class="align-top">Budget No</td><td>: ${budgetNo}</td></tr>
+                            <tr><td class="align-top">Remark</td><td>: ${remark}</td></tr>
+                            </tbody>
+                        </table>
+                        <p class="text-[10px] mt-2">Please attach working order confirmation together with Invoice.</p>
+                        `;
 
             const fullDoc = `
-            <div style="width: 21cm; height: 29.7cm; padding: 2cm; font-size: 10pt;" class="bg-white border shadow mx-auto">
-                ${letterhead}
-                <div class="mt-6">${letterbody}</div>
-                <div class="mt-6">${approval}</div>
-            </div>
-            `;
+                        <div style="width: 21cm; height: 29.7cm; padding: 2cm; font-size: 10pt;" class="bg-white border shadow mx-auto">
+                            ${letterhead}
+                            <div class="mt-6">${letterbody}</div>
+                            <div class="mt-6">${approval}</div>
+                        </div>
+                        `;
 
             modalContent.innerHTML = fullDoc;
             modal.classList.remove("hidden");
@@ -574,6 +649,9 @@
                 picker.setViewDate(new Date());
             }
         });
+
+
+
 
         function formatDate(date) {
             const d = new Date(date);
