@@ -1,19 +1,29 @@
 ﻿using DocumentFormat.OpenXml.Drawing.Spreadsheet;
 using DocumentFormat.OpenXml.Presentation;
+using iTextSharp.tool.xml;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNetCore.Mvc;
+using NGKBusi.Areas.Marketing.Models;
 using NGKBusi.Areas.Purchasing.Models;
 using NGKBusi.Areas.WebService.Models;
 using NGKBusi.Models;
+using Org.BouncyCastle.Asn1.Utilities;
+using Rotativa;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Net.PeerToPeer;
+using System.Security.Claims;
 using System.Text.RegularExpressions;
 using System.Web;
 using System.Web.Mvc;
 using System.Windows.Interop;
+using iTextSharp.text;
+using iTextSharp.text.pdf;
+using iTextSharp.tool.xml;
+using Rotativa;
 using static System.Data.Entity.Infrastructure.Design.Executor;
 
 namespace NGKBusi.Areas.Purchasing.Controllers
@@ -510,6 +520,57 @@ namespace NGKBusi.Areas.Purchasing.Controllers
             }, JsonRequestBehavior.AllowGet);
         }
 
+        public FileResult ExportPDF(string ExportData)
+        {
+            using (MemoryStream stream = new System.IO.MemoryStream())
+            {
+                StringReader reader = new StringReader(ExportData);
+                Document PdfFile = new Document(PageSize.A4);
+                PdfWriter writer = PdfWriter.GetInstance(PdfFile, stream);
+                PdfFile.Open();
+                XMLWorkerHelper.GetInstance().ParseXHtml(writer, PdfFile, reader);
+                PdfFile.Close();
+                return File(stream.ToArray(), "application/pdf", "ExportData.pdf");
+            }
+        }
+        public ActionResult GeneratePdf(int id)
+        {
+            var data = dbm.Purchasing_WorkingOrder_Letter.Where(w => w.ID == id).FirstOrDefault();
 
+           
+            ViewBag.header = data;
+         
+            ViewBag.currUser = ((ClaimsIdentity)User.Identity).GetUserId();
+
+            var spl = dbmp.V_Marketing_MatProm_Request_Detail.Where(w => w.RequestNo == RequestNo).ToList();
+            var request = dbmp.V_Marketing_MatProm_Request.Where(w => w.RequestNo == RequestNo).FirstOrDefault();
+
+            List<Tbl_Marketing_MatProm_ItemList_Request> actions = new List<Tbl_Marketing_MatProm_ItemList_Request>();
+
+            int No = 0;
+            foreach (var Item in spl)
+            {
+                No++;
+                var Tools = "";
+
+
+                actions.Add(
+                    new Tbl_Marketing_MatProm_ItemList_Request
+                    {
+                        Id = No,
+                        ITEMID = Item.ITEMID,
+                        ProductName = Item.ProductName,
+                        Weight = Item.Weight,
+                        Quantity = Item.Quantity,
+                        Qty_Realization = Item.Qty_Realization,
+                        RequestNotes = Item.RequestNotes,
+                        IsChangeQty = Item.IsChangeQty,
+                        Tools = Tools
+                    });
+            }
+
+            ViewBag.itemDetail = actions;
+            return new ViewAsPdf("GeneratePdf");
+        }
     }
 }

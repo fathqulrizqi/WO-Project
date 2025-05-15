@@ -518,7 +518,7 @@ function loadLetterIfExists(idList) {
             base_url: "/node_modules/tinymce",
             plugins: "table code lists",
             toolbar:
-                "undo redo | fontselect | sizeselect | bold italic | alignleft aligncenter alignright | bullist numlist | table tablemergecells tablesplitcells | code ",
+                "undo redo | fontselect | fontsize | bold italic | alignleft aligncenter alignright | bullist numlist | table tablemergecells tablesplitcells | code ",
             menubar: false,
             content_style: `
                             table {
@@ -527,6 +527,7 @@ function loadLetterIfExists(idList) {
                             table td,
                             table th {
                                 border: 1px solid black !important;
+                                font-size: 10px;
                             }
                         `,
             table_default_attributes: {
@@ -539,7 +540,8 @@ function loadLetterIfExists(idList) {
                 'border': '1px solid black'
             },
             table_cell_default_styles: {
-                'border': '1px solid black'
+                'border': '1px solid black',
+                'font-size': '10px'
             },
             setup: function (editor) {
                 editor.on('NewTable', function (e) {
@@ -610,6 +612,13 @@ function loadLetterIfExists(idList) {
                 closeModal();
             }
         });
+
+         $(function () {
+             $("#printButton").click(function () {
+                 //$("input[name='ExportData']").val($("#PrintPDF").html());
+                 window.open('@Url.Action("GeneratePdf", "MatProm", new { area = "Marketing", RequestNo = ViewBag.RequestNo })', '_blank');
+             });
+         });
 
     </script>
 

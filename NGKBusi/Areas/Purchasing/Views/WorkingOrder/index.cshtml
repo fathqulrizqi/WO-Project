@@ -228,7 +228,6 @@
                             return `
                                 <button title="Add details" class="btn btn-pen" data-id="${row.ID}"><i class="fa-solid fa-file-circle-exclamation" style="color: #66ACB4;"></i>
                                 <button title="Edit" class="btn btn-edit" data-id="${row.ID}"><i class="fa-solid fa-pen" style="color: #F6AA04;"></i></button>
-                                <button title="View PDF" class="btn btn-pdf" data-id="${row.ID}"><i class="fa-solid fa-file-pdf" style="color: #2C3E50;"></i></button>
                             `;
                         }
                     }],
@@ -320,11 +319,15 @@
                 alert('PDF button clicked for row with ID: ' + rowId);
             });
 
-            $('#myTable').on('click', '.btn-pen', function () {
+            if ($("#hfIsLogin").val() == "True") {
+               $('#myTable').on('click', '.btn-pen', function () {
                 const rowId = $(this).data('id');
                 const url = '@Url.Action("Detail", "WorkingOrder", new { area = "Purchasing" })' + '?id=' + rowId;
                 window.open(url, '_blank');
             });
+            } else {
+                Swal.fire("Failed!", "Please login first!");
+            }
 
 
            $('#createWObutton').off('click').on('click', function () {
