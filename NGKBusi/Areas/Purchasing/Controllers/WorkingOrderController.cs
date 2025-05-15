@@ -262,6 +262,9 @@ namespace NGKBusi.Areas.Purchasing.Controllers
         {
             ViewBag.budgetList = db.V_FA_BudgetSystem_BEX_BEL.Where(w => w.Latest == 1).ToList();
 
+            var now = DateTime.Now;
+            ViewBag.Now = now;
+
             return View();
         }
 
@@ -349,7 +352,8 @@ namespace NGKBusi.Areas.Purchasing.Controllers
                 EndDate = enddate,
                 BudgetNo = budgetno,
                 BudgetDesc = budgetdesc,
-                Remark = remark
+                Remark = remark,
+                Timestamps = DateTime.Now,
             };
 
             dbm.Purchasing_WorkingOrder_Letter.Add(data);

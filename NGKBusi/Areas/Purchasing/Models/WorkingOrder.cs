@@ -46,6 +46,7 @@ namespace NGKBusi.Areas.Purchasing.Models
         public string BudgetNo { get; set; }
         public string BudgetDesc { get; set; }
         public string Remark { get; set; } = string.Empty;
+        public DateTime Timestamps { get; set; }
     }
 
     public class WOConnection : DbContext

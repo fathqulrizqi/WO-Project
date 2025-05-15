@@ -73,7 +73,6 @@
                 if (res && res.datas) {
                     const data = res.datas;
 
-                    // Populate basic info
                     $("#vendor").text(data.VendorName);
                     $('#number').text(data.Number);
 
@@ -81,10 +80,8 @@
                     const formatted = `${String(today.getDate()).padStart(2, '0')}-${String(today.getMonth() + 1).padStart(2, '0')}-${today.getFullYear()}`;
                     $('#date').text(formatted);
 
-                    // Set hidden ID
                     $("#idList").val(data.ID);
 
-                    // Coba load surat (letter) jika sudah ada
                     loadLetterIfExists(data.ID);
                 }
             },
@@ -331,6 +328,7 @@ function loadLetterIfExists(idList) {
             <p id="number" name="number" class="text-sm font-bold text-center underline"></p>
             <input type="hidden" id="idLetter" />
             <input type="hidden" id="idList" />
+            <input type="hidden" id="timestamps" value="@ViewBag.Now" />
         </div>
 
         <!-- Letter Body -->
@@ -428,6 +426,7 @@ function loadLetterIfExists(idList) {
                                name="startDate"
                                id="startDate"
                                placeholder="Start Date"
+                               autocomplete="off"
                                class="border rounded w-full px-2" />
                     </td>
                 </tr>
@@ -438,6 +437,7 @@ function loadLetterIfExists(idList) {
                                name="endDate"
                                id="endDate"
                                placeholder="End Date"
+                               autocomplete="off"
                                class="border rounded w-full px-2" />
                     </td>
                 </tr>
@@ -523,7 +523,6 @@ function loadLetterIfExists(idList) {
             content_style: `
                             table {
                                 border-collapse: collapse !important;
-                                width: 100% !important;
                             }
                             table td,
                             table th {
@@ -536,7 +535,7 @@ function loadLetterIfExists(idList) {
             },
             table_default_styles: {
                 'border-collapse': 'collapse',
-                'width': '100%',
+                'width': '50%',
                 'border': '1px solid black'
             },
             table_cell_default_styles: {
@@ -571,19 +570,19 @@ function loadLetterIfExists(idList) {
             const vendor = document.getElementById("vendor")?.innerText ?? "##VENDOR##";
 
             const letterbody = `
-                        <table class="table-auto w-full text-[10px]">
+                        <table class="table-fixed w-full text-[10px]">
                             <tbody>
                             <tr><td class="w-[170px] align-top">To</td><td>: ${vendor}</td></tr>
-                            <tr><td class="align-top">Attn</td><td>: ${attn}</td></tr>
-                            <tr><td class="align-top">Ref Quotation No & Date</td><td>: ${ref}</td></tr>
-                            <tr><td class="align-top">Project</td><td>: ${project}<br>${projectContent}</td></tr>
-                            <tr><td class="align-top">Date</td><td>: ${date}</td></tr>
-                            <tr><td class="align-top">Total</td><td>: ${total}</td></tr>
-                            <tr><td class="align-top">Payment Term</td><td>: ${payment}</td></tr>
-                            <tr><td class="align-top">Start Date</td><td>: ${startDate}</td></tr>
-                            <tr><td class="align-top">End Date</td><td>: ${endDate}</td></tr>
-                            <tr><td class="align-top">Budget No</td><td>: ${budgetNo}</td></tr>
-                            <tr><td class="align-top">Remark</td><td>: ${remark}</td></tr>
+                            <tr><td class="w-[170px] align-top">Attn</td><td>: ${attn}</td></tr>
+                            <tr><td class="w-[170px] align-top">Ref Quotation No & Date</td><td>: ${ref}</td></tr>
+                            <tr><td class="w-[170px] align-top">Project</td><td class="max-w-[360px]">: ${project}<br>${projectContent}</td></tr>
+                            <tr><td class="w-[170px] align-top">Date</td><td>: ${date}</td></tr>
+                            <tr><td class="w-[170px] align-top">Total</td><td>: ${total}</td></tr>
+                            <tr><td class="w-[170px] align-top">Payment Term</td><td>: ${payment}</td></tr>
+                            <tr><td class="w-[170px] align-top">Start Date</td><td>: ${startDate}</td></tr>
+                            <tr><td class="w-[170px] align-top">End Date</td><td>: ${endDate}</td></tr>
+                            <tr><td class="w-[170px] align-top">Budget No</td><td>: ${budgetNo}</td></tr>
+                            <tr><td class="w-[170px] align-top">Remark</td><td>: ${remark}</td></tr>
                             </tbody>
                         </table>
                         <p class="text-[10px] mt-2">Please attach working order confirmation together with Invoice.</p>
@@ -615,55 +614,26 @@ function loadLetterIfExists(idList) {
     </script>
 
     <script>
-        const startInput = document.getElementById('startDate');
-        const endInput = document.getElementById('endDate');
-
-        const picker = new AirDatepicker(startInput, {
-            range: true,
-            minDate: new Date(),
-            dateFormat: 'dd-MM-yyyy',
-            multipleDatesSeparator: ' - ',
-            locale: {
-                days: ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
-                daysShort: ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"],
-                daysMin: ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"],
-                months: ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"],
-                monthsShort: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
-                today: "Today",
-                clear: "Clear",
-                firstDay: 0
-            },
-            onSelect({ date }) {
-                if (Array.isArray(date)) {
-                    if (date.length >= 1) {
-                        startInput.value = formatDate(date[0]);
-                    }
-                    if (date.length === 2) {
-                        endInput.value = formatDate(date[1]);
-                    } else {
-                        endInput.value = '';
-                    }
-                }
-            },
-            onHide() {
-                picker.setViewDate(new Date());
-            }
-        });
-
-
-
-
-        function formatDate(date) {
-            const d = new Date(date);
-            const day = String(d.getDate()).padStart(2, '0');
-            const month = String(d.getMonth() + 1).padStart(2, '0');
-            const year = d.getFullYear();
-            return `${day}-${month}-${year}`;
+        function datepicker(selector) {
+            new AirDatepicker(selector, {
+                dateFormat: 'dd-MM-yyyy',
+                minDate: new Date(),
+                locale: {
+                    days: ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
+                    daysShort: ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"],
+                    daysMin: ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"],
+                    months: ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"],
+                    monthsShort: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
+                    today: "Today",
+                    clear: "Clear",
+                    firstDay: 0
+                },
+            });
         }
 
-        endInput.addEventListener('click', () => {
-            picker.show();
-        });
+        datepicker("#startDate");
+        datepicker("#endDate");
+
     </script>
 
 
