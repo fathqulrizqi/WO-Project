@@ -16,6 +16,8 @@
           href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.3/css/bootstrap.min.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-x..." crossorigin="anonymous" referrerpolicy="no-referrer" />
     <link href="~/Content/sweetalert2/sweetalert2.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdn.ckeditor.com/ckeditor5/45.0.0/ckeditor5.css" />
+
     <style>
 
         .page-content {
@@ -38,44 +40,50 @@
             width: 100%;
         }
 
-       /* .dt-search {
-            display: flex;
-            margin: 0;
-            max-width: 150px;
-            padding: 4px 0;
+        .select2-selection.is-invalid {
+            border: 1px solid #dc3545 !important;
+            border-radius: 0.25rem;
+            z-index: 999;
         }
 
-            .dt-search > label {
-                font-size: 0;
-                position: relative;
-                display: block;
-            }
+        /* .dt-search {
+                    display: flex;
+                    margin: 0;
+                    max-width: 150px;
+                    padding: 4px 0;
+                }
 
-            .dt-search input[type="search"] {
-                display: flex;
-                width: 100%;
-                padding: 0.5rem 0.75rem 0.5rem 2.5rem;
-                margin-right: 5px;
-                font-size: 0.875rem;
-                color: #111827;
-                border: 1px solid #d1d5db;
-                border-radius: 0.5rem;
-                background-color: #f9fafb;
-                background-image: url("data:image/svg+xml,%3Csvg fill='gray' viewBox='0 0 20 20' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath fill-rule='evenodd' d='M12.9 14.32a8 8 0 111.414-1.414l5.387 5.387a1 1 0 01-1.414 1.414l-5.387-5.387zM14 8a6 6 0 11-12 0 6 6 0 0112 0z' clip-rule='evenodd'%3E%3C/path%3E%3C/svg%3E");
-                background-repeat: no-repeat;
-                background-position: 0.75rem center;
-                background-size: 1rem 1rem;
-                outline: none;
-            }
+                    .dt-search > label {
+                        font-size: 0;
+                        position: relative;
+                        display: block;
+                    }
 
-                .dt-search input[type="search"]::placeholder {
-                    color: #6b7280;
-                    font-size: 0.875rem;
-                }*/
+                    .dt-search input[type="search"] {
+                        display: flex;
+                        width: 100%;
+                        padding: 0.5rem 0.75rem 0.5rem 2.5rem;
+                        margin-right: 5px;
+                        font-size: 0.875rem;
+                        color: #111827;
+                        border: 1px solid #d1d5db;
+                        border-radius: 0.5rem;
+                        background-color: #f9fafb;
+                        background-image: url("data:image/svg+xml,%3Csvg fill='gray' viewBox='0 0 20 20' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath fill-rule='evenodd' d='M12.9 14.32a8 8 0 111.414-1.414l5.387 5.387a1 1 0 01-1.414 1.414l-5.387-5.387zM14 8a6 6 0 11-12 0 6 6 0 0112 0z' clip-rule='evenodd'%3E%3C/path%3E%3C/svg%3E");
+                        background-repeat: no-repeat;
+                        background-position: 0.75rem center;
+                        background-size: 1rem 1rem;
+                        outline: none;
+                    }
+
+                        .dt-search input[type="search"]::placeholder {
+                            color: #6b7280;
+                            font-size: 0.875rem;
+                        }*/
 
         table {
             width: 100%;
-            table-layout: auto ;
+            table-layout: auto;
         }
 
         .myTable-topbar {
@@ -114,18 +122,36 @@
             margin-bottom: 1rem;
         }
 
-       /* .dt-orderable-asc {
-            width: 100px;
-        }
+        /* .dt-orderable-asc {
+                    width: 100px;
+                }
 
-            .dt-orderable-asc th[data-dt-column="0"] {
-                width: 80px
-            }
-*/
+                    .dt-orderable-asc th[data-dt-column="0"] {
+                        width: 80px
+                    }
+        */
         .dataTables_scrollBody {
             overflow-y: auto;
         }
 
+        .main-container {
+            width: 795px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .dt-search {
+            transition: padding 0.2s ease;
+            padding: 4px 0;
+        }
+
+            .dt-search.clicked {
+                padding: 4px;
+                border: none !important;
+                border-radius: 5px;
+                color: white;
+                font-weight: bold;
+            }
     </style>
 
 }
@@ -145,6 +171,14 @@
         }
     </script>
     <script>
+            $(document).on('focus', '.dt-search', function () {
+                $(this).addClass('clicked');
+            });
+
+            $(document).on('blur', '.dt-search', function () {
+                $(this).removeClass('clicked');
+            });
+
         $(document).ready(function () {
             $(".selVendorList").select2({
                 dropdownParent: $("#createWOModal"),
@@ -159,7 +193,7 @@
                 responsive: true,
                 autoWidth: true,
                 fixedHeader: true,
-                order: [],
+                order: [[0, 'desc']],
                 ajax: {
                 url: '@Url.Action("GetDatas", "WorkingOrder", new { area = "Purchasing" })',
                     type: 'GET',
@@ -180,37 +214,32 @@
                             }
                         }
                     },
-                    { title: 'Number', data: 'Number' },
+                    { title: 'Number', data: 'Number', width: '180px' },
                     { title: 'Vendor', data: 'VendorName' },
-                    { title: 'Subject', data: 'Subject' },
+                    { title: 'Subject', data: 'Subject'  },
                     { title: 'User', data: 'NIKName' },
                     {
                         data: null,
                         title: 'Action',
                         searchable: false,
-                        width: '120px',
+                        width: '180px',
                         orderable: false,
                         render: function (data, type, row) {
                             return `
-                                <button class="btn btn-pdf" data-id="${row.ID}"><i class="fa-solid fa-file-pdf" style="color: #2C3E50;"></i></button>
-                                <button class="btn btn-edit" data-id="${row.ID}"><i class="fa-solid fa-edit" style="color: orange;"></i></button>
+                                <button title="Add details" class="btn btn-pen" data-id="${row.ID}"><i class="fa-solid fa-file-circle-exclamation" style="color: #66ACB4;"></i>
+                                <button title="Edit" class="btn btn-edit" data-id="${row.ID}"><i class="fa-solid fa-pen" style="color: #F6AA04;"></i></button>
                             `;
                         }
                     }],
                 initComplete: function () {
-                    this.api()
-                        .columns()
-                        .every(function () {
-                            var column = this;
-                            var title = column.header().textContent;
-                            if (column.index() !== 6) {
-                                $('<input style="width: 100%; padding: 0.5rem 0.75rem; background-color: white; margin-top: 5px; border: 1px #6B7884 solid; border-radius: 5px;" class="dt-search" type="text" placeholder="Search ' + title + '" />')
-                                    .appendTo($(column.footer()))
-                                    .off('keyup change clear').on("keyup change clear", function () {
-                                        column.search(this.value).draw();
-                                    });
+                    this.api().columns().every(function () {
+                        var column = this;
+                        $('input', this.header()).on('keyup change clear', function () {
+                            if (column.search() !== this.value) {
+                                column.search(this.value).draw();
                             }
                         });
+                    });
                 },
                 layout: {
                     topStart: "pageLength",
@@ -238,32 +267,39 @@
                 data: { id: rowId },
                 dataType: "json",
                 cache: false,
-                success: function (res) {
-                    if (res && res.datas) {
-                        const data = res.datas;
-                        $("#NIK").val(data.NIKName || "");
-                        $("#subject").val(data.Subject || "");
-                        const vendorName = data.VendorName || "-- Select a Vendor --";
-                        $('#selVendorList').val(data.VendorName || "").trigger('change');
-                        $('#select2-selVendorList-container').text(vendorName);
-                        $('#timestamps').val(data.Timestamps);
-                        $('#number').val(data.Number);
-                        $('#idWO').val(rowId);
+                    success: function (res) {
+                        if (res && res.datas) {
+
+                            if ($("#hfIsLogin").val() == "True") {
+
+                            const data = res.datas;
+                            $("#NIK").val(data.NIKName || "");
+                            $("#subject").val(data.Subject || "");
+                            const vendorName = data.VendorName;
+                            $('#selVendorList').val(data.Vendor).trigger('change');
+                            $('#selVendorList').valid();
+                            $('#select2-selVendorList-container').text(data.Vendor + " | " + data.VendorName);
+                            $('#timestamps').val(data.Timestamps);
+                            $('#number').val(data.Number);
+                            $('#idWO').val(rowId);
 
 
-                        let rawDate = data.Date;
-                        if (rawDate) {
-                            const parts = rawDate.split('-');
-                            const formatted = `${parts[2]}-${parts[1]}-${parts[0]}`;
-                            $("#Date").val(formatted);
-                        }
-                        $('#btnSave').hide();
-                        $('#btnEdit').show();
+                            let rawDate = data.Date;
+                            if (rawDate) {
+                                const parts = rawDate.split('-');
+                                const formatted = `${parts[2]}-${parts[1]}-${parts[0]}`;
+                                $("#Date").val(formatted);
+                            }
+                            $('#btnSave').hide();
+                            $('#btnEdit').show();
 
-                        $('#exampleModalLabel').text("Edit Working Order");
-                        $("#createWOModal").modal("show");
-                        $('#timestampsDiv').show();
-                        $('#numberDiv').show();
+                            $('#exampleModalLabel').text("Edit Working Order");
+                            $("#createWOModal").modal("show");
+                            $('#timestampsDiv').show();
+                                $('#numberDiv').show();
+                            } else {
+                                Swal.fire("Failed!", "Please login first!");
+                            }
 
                         } else {
                             Swal.fire('Error!', 'No data found for the selected ID.', 'error');
@@ -272,6 +308,7 @@
                     error: function () {
                         Swal.fire('Error!', 'Failed to retrieve schedule data.', 'error');
                     }
+
             });
 
 
@@ -282,21 +319,36 @@
                 alert('PDF button clicked for row with ID: ' + rowId);
             });
 
+            if ($("#hfIsLogin").val() == "True") {
+               $('#myTable').on('click', '.btn-pen', function () {
+                const rowId = $(this).data('id');
+                const url = '@Url.Action("Detail", "WorkingOrder", new { area = "Purchasing" })' + '?id=' + rowId;
+                window.open(url, '_blank');
+            });
+            } else {
+                Swal.fire("Failed!", "Please login first!");
+            }
+
 
            $('#createWObutton').off('click').on('click', function () {
                if ($("#hfIsLogin").val() == "True") {
-                    $("#createWOModal").modal("show");
-                    $('#timestampsDiv').hide();
-                    $('#btnEdit').hide();
-                    $('#btnSave').show();
-                    $('#numberDiv').hide();
-                } else {
-                    Swal.fire("Failed!", "Please login first!");
+                   $("#createWOModal").modal("show");
+                   $('#exampleModalLabel').text("Create Working Order");
+                   $('#timestampsDiv').hide();
+                   $('#btnEdit').hide();
+                   $('#btnSave').show();
+                   $('#numberDiv').hide();
+               } else {
+                   Swal.fire("Failed!", "Please login first!");
                }
            });
 
             $('#btnSave').off('click').on('click', function(e) {
                 e.preventDefault();
+
+                if (!$('#formWO').valid()) {
+                    return;
+                }
 
                 var formData = {
                     Date: $('#Date').val(),
@@ -343,11 +395,17 @@
             $('#btnEdit').off('click').on('click', function(e) {
                 e.preventDefault();
 
+                if (!$('#formWO').valid()) {
+                    return;
+                }
+
+                var selectedVendor = $('#selVendorList').val();
+
                 var formData = {
                     id: $('#idWO').val(),
                     Date: $('#Date').val(),
                     NIK: $('#NIK').attr('name'),
-                    selVendorList: $('#select2-selVendorList-container').text(),
+                    selVendorList: selectedVendor,
                     Subject: $('#subject').val(),
                     Number: $('#number').val(),
                     Timestamps: $('#timestamps').val()
@@ -390,9 +448,16 @@
 
             $('#createWOModal').off('hidden.bs.modal').on('hidden.bs.modal', function () {
                 $('#formWO')[0].reset();
-                $("#selVendorList").val('').trigger('change');
-                $('#subject').val('');
+                $('#formWO .invalid-feedback').remove();
+                $('#formWO .form-control').removeClass('is-invalid');
+
+                $("#selVendorList").val(null).trigger('change');
+                $("#selVendorList").next('.select2-container').find('.select2-selection').removeClass('is-invalid');
+
+                formWOValidate.resetForm();
             });
+
+
 
         });
         DataTable.type('date', 'className', ' ');
@@ -418,11 +483,11 @@
             </thead>
             <thead>
                 <tr>
-                    <th><input style="padding: 4px 6px; font-size: 12px; width: 100px;" type="text" placeholder="Search Date" class="dt-search" /></th>
-                    <th><input style="padding: 4px 6px; font-size: 12px;" type="text" placeholder="Search Number" class="dt-search" /></th>
-                    <th><input style="padding: 4px 6px; font-size: 12px;" type="text" placeholder="Search Vendor" class="dt-search" /></th>
-                    <th><input style="padding: 4px 6px; font-size: 12px;" type="text" placeholder="Search Subject" class="dt-search" /></th>
-                    <th><input style="padding: 4px 6px; font-size: 12px;" type="text" placeholder="Search User" class="dt-search" /></th>
+                    <th><input style=" font-size: 12px;" type="text" placeholder="Search Date" class="dt-search" /></th>
+                    <th><input style="font-size: 12px;" type="text" placeholder="Search Number" class="dt-search" /></th>
+                    <th><input style=" font-size: 12px;" type="text" placeholder="Search Vendor" class="dt-search" /></th>
+                    <th><input style="font-size: 12px;" type="text" placeholder="Search Subject" class="dt-search" /></th>
+                    <th><input style="font-size: 12px;" type="text" placeholder="Search User" class="dt-search" /></th>
                     <th></th>
                 </tr>
             </thead>
@@ -434,97 +499,44 @@
     </div>
 </div>
 
-<div class="modal fade" id="createWOModal" aria-labelledby="exampleModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-xl">
-        <div class="modal-content">
-            <div class="modal-header" style="background-color: #007582;">
-                <h1 class="modal-title fs-5" style="color: white; font-weight:bold;" id="exampleModalLabel">Create Working Order</h1>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
+@Html.Partial("Partial/Modal")
 
-            <form id="formWO" class="needs-validation" action="#" method="POST" novalidate>
-                <div class="modal-body">
-                    <div class="mb-3">
-                        <div class="row mb-3">
-                            <div class="col-2">
-                                <label for="NIK" class="form-label">User</label>
-                            </div>
-                            <div class="col-10">
-                                <input type="text" class="form-control" id="NIK" value="@ViewBag.currUsrName" name="@ViewBag.currUsr" readonly>
-                            </div>
-                        </div>
-                        <div class="row mb-3">
-                            <div class="col-2">
-                                <label for="Date" class="form-label">Date</label>
-                            </div>
-                            <div class="col-10">
-                                <input type="text" class="form-control" id="Date" name="Date" value="@ViewBag.currDate" readonly>
-                            </div>
-                        </div>
+<script>
 
-                        <div class="row mb-3" id="numberDiv">
-                            <div class="col-2">
-                                <label for="number" class="form-label">Number</label>
-                            </div>
-                            <div class="col-10">
-                                <input type="text" class="form-control" id="number" name="Number" readonly>
-                            </div>
-                        </div>
-
-                        <div class="row mb-3">
-                            <div class="col-2">
-                                <label for="selVendorList" class="form-label">Vendor</label>
-                                <span style="color: red;">*</span>
-                            </div>
-                            <div class="col-10">
-                                <div class="position-relative">
-                                    <select style="padding: 4px;" id="selVendorList" class="selVendorList">
-                                        <option value="">-- Select a Vendor --</option>
-                                        @foreach (var data in ViewBag.vendorList)
-                                        {
-                                            <option value="@data.ACCOUNTNUM">
-                                                @(data.ACCOUNTNUM + " | " + data.Name)
-                                            </option>
-                                        }
-                                    </select>
-                                </div>
-                            </div>
-                        </div>
-
-                        <input type="hidden" class="form-control" id="idWO" name="id" readonly>
+    var formWOValidate = $("#formWO").validate({
+        rules: {
+            selVendorList: { required: true },
+            Subject: { required: true, maxlength: 100 },
+        },
+        messages: {
+            selVendorList: { required: "Please select a vendor." },
+            Subject: { required: "Please enter a subject.", maxlength: "Maximum 100 characters allowed." },
+        },
+        errorElement: 'div',
+        errorPlacement: function (error, element) {
+            error.addClass('invalid-feedback');
+            if (element.hasClass('selVendorList')) {
+                error.insertAfter(element.next('.select2-container'));
+            } else {
+                error.insertAfter(element);
+            }
+            error.show();
+        },
+        highlight: function (element, errorClass, validClass) {
+            if ($(element).hasClass('selVendorList')) {
+                $(element).next('.select2-container').find('.select2-selection').addClass('is-invalid');
+            } else {
+                $(element).addClass('is-invalid');
+            }
+        },
+        unhighlight: function (element, errorClass, validClass) {
+            if ($(element).hasClass('selVendorList')) {
+                $(element).next('.select2-container').find('.select2-selection').removeClass('is-invalid');
+            } else {
+                $(element).removeClass('is-invalid');
+            }
+        }
+    });
 
 
-                        <div class="row mb-3">
-                            <div class="col-2">
-                                <label for="subject" class="form-label">Subject</label>
-                                <span style="color: red;">*</span>
-                            </div>
-                            <div class="col-10">
-                                <textarea class="form-control" id="subject" rows="3" style="resize:none;" name="Subject" placeholder="Please write your working order purpose..." required></textarea>
-                            </div>
-                        </div>
-
-                        <div class="row mb-3" id="timestampsDiv">
-                            <div class="col-2">
-                                <label for="timestamps" class="form-label">Created Time</label>
-                            </div>
-                            <div class="col-10">
-                                <input type="text" class="form-control" id="timestamps" name="Timestamps" readonly>
-                            </div>
-                        </div>
-
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                            <button type="submit" class="btn btn-primary" id="btnSave">
-                                <i class="fa fa-plus"></i> | <span>Add</span>
-                            </button>
-                            <button type="submit" class="btn btn-primary" id="btnEdit">
-                                <i class="fa fa-edit"></i> | <span>Edit</span>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
+</script>

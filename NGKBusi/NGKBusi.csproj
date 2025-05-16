@@ -690,6 +690,11 @@
     <Compile Include="Startup.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Content\air-datepicker\air-datepicker.css" />
+    <Content Include="Content\air-datepicker\air-datepicker.js" />
+    <Content Include="Content\air-datepicker\index.es.js" />
+    <Content Include="Content\air-datepicker\locale\en.js" />
+    <Content Include="Content\air-datepicker\locale\id.js" />
     <Content Include="Content\bootstrap-grid.css" />
     <Content Include="Content\bootstrap-grid.min.css" />
     <Content Include="Content\bootstrap-grid.rtl.css" />
@@ -3636,6 +3641,7 @@
     <Content Include="Content\Images\menuPE.jpg" />
     <Content Include="Content\Images\ngk-logo.png" />
     <Content Include="Content\Images\niterra-logo.jpg" />
+    <Content Include="Content\Images\tuv-image.png" />
     <Content Include="Content\Images\user.jpg" />
     <Content Include="Content\IT\MasterList.css" />
     <Content Include="Content\IT\ServiceRequest.css" />
@@ -4478,6 +4484,10 @@
     <Content Include="Areas\Other\Views\NWR\Index.cshtml" />
     <Content Include="Areas\Purchasing\Views\_ViewStart.cshtml" />
     <Content Include="Areas\Purchasing\Views\WorkingOrder\index.cshtml" />
+    <Content Include="Areas\Purchasing\Views\WorkingOrder\detail.cshtml" />
+    <Content Include="Areas\Purchasing\Views\WorkingOrder\Partial\Modal.cshtml" />
+    <Content Include="Content\air-datepicker\package.json" />
+    <Content Include="Content\air-datepicker\README.md" />
     <None Include="Properties\PublishProfiles\NGKBusi.pubxml" />
     <Content Include="Content\animsition\animsition.css" />
     <Content Include="Content\animsition\animsition.min.css" />
@@ -7272,6 +7282,8 @@
     <Content Include="Views\Account\Login - Copy.cshtml" />
     <Content Include="Views\User\Login - Copy.cshtml" />
     <Content Include="Views\User\Login.cshtml" />
+    <Content Include="Scripts\moment.min.js.map" />
+    <Content Include="Scripts\moment-with-locales.min.js.map" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
@@ -7334,6 +7346,7 @@
     <Service Include="{4A0DDDB5-7A95-4FBF-97CC-616D07737A77}" />
   </ItemGroup>
   <ItemGroup>
+    <TypeScriptCompile Include="Content\air-datepicker\air-datepicker.d.ts" />
     <TypeScriptCompile Include="Scripts\index.d.ts" />
     <TypeScriptCompile Include="Scripts\jspreadsheet\dist\index.d.ts" />
     <TypeScriptCompile Include="Scripts\jspreadsheet\src\index.d.ts" />
@@ -7451,7 +7464,7 @@
           <AutoAssignPort>True</AutoAssignPort>
           <DevelopmentServerPort>50786</DevelopmentServerPort>
           <DevelopmentServerVPath>/</DevelopmentServerVPath>
-          <IISUrl>http://localhost/NGKBusi</IISUrl>
+          <IISUrl>http://localhost:1075/NGKBusi</IISUrl>
           <NTLMAuthentication>False</NTLMAuthentication>
           <UseCustomServer>False</UseCustomServer>
           <CustomServerUrl>
